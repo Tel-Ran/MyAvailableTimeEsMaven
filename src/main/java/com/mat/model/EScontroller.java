@@ -5,33 +5,37 @@ import java.util.*;
 import com.mat.interfaces.IExternalServices;
 import com.mat.json.*;
 import com.google.api.client.auth.oauth2.Credential;
-//google:
-import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.CalendarList;
-import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.calendar.model.Events;
-import com.mat.interfaces.IExternalServices;
-import com.mat.interfaces.ServicesConstants;
-import com.mat.json.*;
 
 
 public abstract class EScontroller implements IExternalServices {
 	
-	List
-	
-	static Calendar googleService;
-	static ExchangeService outlookService;
+	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
+	//HashMap<Integer, HashMap<String, Credential>> credentials = new HashMap<Integer, HashMap<String, Credential>>();
+	HashMap<Integer, HashMap<Scheduler, List<ExternalCalendar>>> calendars = new HashMap<Integer, HashMap<Scheduler,List<ExternalCalendar>>>();
+	HashMap<Integer, HashMap<Scheduler, List<Contact>>> contacts = new HashMap<Integer, HashMap<Scheduler,List<Contact>>>(); 
 	
 		public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
-		return null;
+			List<ExternalCalendar> exCalendars = new ArrayList<ExternalCalendar>();
+			for (int i = 0; i < schedulers.size(); i++) {
+				List<ExternalCalendar> tempCal = calendars.get(userId).get(schedulers.get(i));
+				if (tempCal != null)
+					exCalendars.addAll(tempCal);
+			}
+			return exCalendars;
+				
+			
 	}
 
-	public List<Contact> getContacts(int UserId, List<Scheduler> schedulers) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Contact> getContacts(int userId, List<Scheduler> schedulers) {
+		List<Contact> tmpContacts = new ArrayList<Contact>();
+		for (int i = 0; i < schedulers.size(); i++) {
+			List<Contact> tempList = contacts.get(userId).get(contacts.get(i));
+			if (tempList != null)
+				tmpContacts.addAll(tempList);
+		}
+		return tmpContacts;
+			
+		}
 	}
 
-}
+

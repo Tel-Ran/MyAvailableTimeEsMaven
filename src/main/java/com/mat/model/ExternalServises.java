@@ -15,8 +15,7 @@ public class ExternalServises extends EScontroller{
 	/**
 	 * map of credentials
 	 */
-	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
-//HashMap<Integer, HashMap<String, Credential>> credentials = new HashMap<Integer, HashMap<String, Credential>>();
+	
 
 	/**
 	 * get credential from map by userId and scheduler
