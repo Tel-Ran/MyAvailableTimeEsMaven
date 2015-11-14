@@ -1,23 +1,62 @@
 package com.mat.model;
 
-import java.util.List;
-
+import java.util.HashMap;
 import com.google.api.client.auth.oauth2.Credential;
 import com.mat.interfaces.IExternalServices;
 import com.mat.json.Scheduler;
 
 
 public class ExternalServises implements IExternalServices{
+	
+	/**
+	 * map of credentials
+	 */
+	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
+//HashMap<Integer, HashMap<String, Credential>> credentials = new HashMap<Integer, HashMap<String, Credential>>();
 
+	/**
+	 * get credential from map by userId and scheduler
+	 */
 	public Credential getCredential(int userId, Scheduler scheduler) {
-		// TODO Auto-generated method stub
-		return null;
+
+		Credential credential = credentials.get(userId).get(scheduler);
+		return credential;
 	}
 
+	/**
+	 * store credential to map
+	 */
 	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
-		// TODO Auto-generated method stub
+		
+		HashMap<Scheduler, Credential> tempMap = new HashMap<Scheduler, Credential>();
+		tempMap.put(scheduler, credential);
+		credentials.put(userId, tempMap);
 		
 	}
+
+/**
+ * the same but in the map we store not whole Scheduler object but just a string from it	
+ */
+	
+	/**
+	 * get credential from map by userId and scheduler
+	 */
+/*	public Credential getCredential(int userId, Scheduler scheduler) {
+
+		Credential credential = credentials.get(userId).get(scheduler.getSchedulerName());
+		return credential;
+	}*/
+
+	/**
+	 * store credential to map
+	 */
+	/*public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+		HashMap<String, Credential> tempMap = new HashMap<String, Credential>();
+		tempMap.put(scheduler.getShedulerName(), credential);
+		credentials.put(userId, tempMap);
+	}
+	*/	
+	
 
 	
 	
