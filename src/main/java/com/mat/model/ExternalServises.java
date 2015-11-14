@@ -1,12 +1,16 @@
 package com.mat.model;
 
 import java.util.HashMap;
+import java.util.List;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.mat.interfaces.IExternalServices;
+import com.mat.json.Contact;
+import com.mat.json.ExternalCalendar;
 import com.mat.json.Scheduler;
 
 
-public class ExternalServises implements IExternalServices{
+public class ExternalServises extends EScontroller{
 	
 	/**
 	 * map of credentials
@@ -33,6 +37,7 @@ public class ExternalServises implements IExternalServices{
 		credentials.put(userId, tempMap);
 		
 	}
+
 
 /**
  * the same but in the map we store not whole Scheduler object but just a string from it	

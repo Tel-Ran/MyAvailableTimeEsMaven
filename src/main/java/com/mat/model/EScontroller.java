@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.mat.interfaces.IExternalServices;
 import com.mat.json.*;
+import com.google.api.client.auth.oauth2.Credential;
 //google:
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
@@ -17,48 +18,20 @@ import com.mat.interfaces.ServicesConstants;
 import com.mat.json.*;
 
 
-public class EScontroller implements IExternalServices {
+public abstract class EScontroller implements IExternalServices {
 	
+	List
 	
 	static Calendar googleService;
 	static ExchangeService outlookService;
 	
-	
-	@Override
-	public boolean upload(UploadRequest request) throws Throwable {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public DownloadEventsResponse download(DownloadEventsRequest request)
-			throws Throwable {
-		// TODO Auto-generated method stub
+		public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
 		return null;
 	}
 
-	@Override
-	public boolean authorize(User user) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public List<Contact> getContacts(User user) {
+	public List<Contact> getContacts(int UserId, List<Scheduler> schedulers) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public List<ExternalCalendar> getCalendars() throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setToken() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
