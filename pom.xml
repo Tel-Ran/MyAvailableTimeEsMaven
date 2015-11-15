@@ -119,6 +119,14 @@
 	<artifactId>spring-web</artifactId>
 	<version>4.2.2.RELEASE</version>
 </dependency>
+
+<!-- Caucho Hessian support -->
+<dependency>
+	<groupId>com.caucho</groupId>
+	<artifactId>hessian</artifactId>
+	<version>4.0.38</version>
+</dependency>
+
 		
 		
 	</dependencies>
