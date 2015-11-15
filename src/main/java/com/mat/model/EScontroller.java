@@ -7,7 +7,7 @@ import com.mat.json.*;
 import com.google.api.client.auth.oauth2.Credential;
 
 
-public abstract class EScontroller implements IExternalServices {
+public class EScontroller implements IExternalServices {
 	
 	//HashMap<Integer, HashMap<String, Credential>> credentials = new HashMap<Integer, HashMap<String, Credential>>();
 	HashMap<Integer, HashMap<Scheduler, List<ExternalCalendar>>> calendars = new HashMap<Integer, HashMap<Scheduler,List<ExternalCalendar>>>();
@@ -35,6 +35,26 @@ public abstract class EScontroller implements IExternalServices {
 		return tmpContacts;
 			
 		}
+
+	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public List<Scheduler> getAuthorizedSchedulers(int userId, List<Scheduler> schedulers) throws Throwable {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean upload(int userId, UploadRequest request) throws Throwable {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	}
 
 
