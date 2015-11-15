@@ -5,7 +5,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
+import com.mat.json.Contact;
 import com.mat.json.DownloadEvent;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
@@ -35,7 +38,7 @@ import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
-public class OutlookExternalServices {
+public class OutlookExternalServices implements IService{
 	ExchangeService service;
 	List<Folder> folders;
 
@@ -51,32 +54,6 @@ public class OutlookExternalServices {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public boolean upload(UploadRequest request) throws Throwable {
-		String eventName = request.getMyCalendarName();
-		for (ExternalCalendar calendar : request.getCalendars()) {
-			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
-				Folder folder = getFolderByName(calendar.getCalendarName());
-				clearPreviousEvents(folder.getId(), eventName);
-				for (Date startDate : request.getSlots()) {
-					Date endDate = dateAdd(startDate, request.getDuration());
-					createAppointment(folder, eventName, "", startDate, endDate);
-				}
-			}
-		}
-		return true;
-	}
-
-	public DownloadEventsResponse download(DownloadEventsRequest request) throws Throwable {
-		DownloadEventsResponse result = new DownloadEventsResponse();
-		List<ExternalCalendar> calendars = request.getCalendars();
-		List<DownloadEvent> events = new ArrayList<DownloadEvent>();
-		for (ExternalCalendar calendar : calendars) {
-			events.addAll(findAppointments(getFolder(calendar), request.getFromDate(), request.getToDate()));
-		}
-		result.setEvents(events);
-		return result;
 	}
 
 	private List<DownloadEvent> findAppointments(Folder folder, Date startDate, Date endDate) throws Exception {
@@ -182,6 +159,42 @@ public class OutlookExternalServices {
 		cal.setTime(startDateAppointment);
 		cal.add(Calendar.MINUTE, duration);
 		return cal.getTime();
+	}
+
+	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
+		String eventName = request.getMyCalendarName();
+		for (ExternalCalendar calendar : request.getCalendars()) {
+			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
+				Folder folder = getFolderByName(calendar.getCalendarName());
+				clearPreviousEvents(folder.getId(), eventName);
+				for (Date startDate : request.getSlots()) {
+					Date endDate = dateAdd(startDate, request.getDuration());
+					createAppointment(folder, eventName, "", startDate, endDate);
+				}
+			}
+		}
+		return true;
+	}
+
+	public DownloadEventsResponse download(Credential credential, DownloadEventsRequest request) throws Throwable {
+		DownloadEventsResponse result = new DownloadEventsResponse();
+		List<ExternalCalendar> calendars = request.getCalendars();
+		List<DownloadEvent> events = new ArrayList<DownloadEvent>();
+		for (ExternalCalendar calendar : calendars) {
+			events.addAll(findAppointments(getFolder(calendar), request.getFromDate(), request.getToDate()));
+		}
+		result.setEvents(events);
+		return result;
+	}
+
+	public List<Contact> getContacts(Credential credential) throws Throwable {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 
