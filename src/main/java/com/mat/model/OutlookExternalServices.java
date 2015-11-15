@@ -38,11 +38,11 @@ import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
-public class OutlookExternalServices implements IService{
+public class OutlookExternalServices implements IService {
 	ExchangeService service;
 	List<Folder> folders;
 
-	public List<Folder> getFolders() {
+	private List<Folder> getFolders() {
 		return folders;
 	}
 
@@ -193,7 +193,17 @@ public class OutlookExternalServices implements IService{
 	}
 
 	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
-		// TODO Auto-generated method stub
+		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
+		for (Folder folder : folders) {
+			calendars.add(getCalendarByFolder(folder));
+		}
+		return calendars;
+	}
+
+	private ExternalCalendar getCalendarByFolder(Folder folder) throws ServiceLocalException {
+		ExternalCalendar calendar = new ExternalCalendar();
+		calendar.setCalendarName(folder.getDisplayName());
+		calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
 		return null;
 	}
 }
