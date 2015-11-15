@@ -1,1 +1,7 @@
-/target/
+/target/classes/ExternalServices/META-INF/
+/target/classes/ExternalServices/WEB-INF/classes/
+/target/classes/ExternalServices/WEB-INF/lib/
+/target/classes/generated-sources/
+/target/classes/m2e-wtp/
+/target/classes/maven-archiver/
+/target/classes/ExternalServices.war

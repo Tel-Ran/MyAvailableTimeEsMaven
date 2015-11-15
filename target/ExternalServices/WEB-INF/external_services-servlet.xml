@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd ">
+  
+  
+  
+  
+  
+<!-- components of the books application service getting result of any query -->
+<bean id="controller" class="com.mat.model.EScontroller" > <!-- class for calculator application model -->
+</bean>
+<!-- ********** -->
+
+<!-- Hessian Service Exporter -->
+<bean id="HessianExternalServices" class="org.springframework.remoting.caucho.HessianServiceExporter">
+
+<!-- reference to the service -->
+<property  name="service" ref="controller"></property> 
+
+<!-- interface of the service -->
+<property name="serviceInterface" value="com.mat.interfaces.IExternalServices"></property> 
+</bean>
+
+<!-- ********** -->
+<!-- mapping to the application service -->
+<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+<property name="mappings" value="/external_services.service=HessianExternalServices"/>
+</bean>
+
+<!-- ********** -->
+
+ 
+</beans>
