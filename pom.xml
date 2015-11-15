@@ -116,6 +116,14 @@
 	<version>4.2.2.RELEASE</version>
 </dependency>
 
+<!-- Spring MVC support -->
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-webmvc</artifactId>
+	<version>4.2.2.RELEASE</version>
+</dependency>
+
+
 <!-- Caucho Hessian support -->
 <dependency>
 	<groupId>com.caucho</groupId>
