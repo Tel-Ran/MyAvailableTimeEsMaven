@@ -13,6 +13,7 @@ import com.mat.json.DownloadEvent;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
 import com.mat.json.ExternalCalendar;
+import com.mat.json.Scheduler;
 import com.mat.json.UploadRequest;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
@@ -216,7 +217,23 @@ public class OutlookExternalServices implements IService {
 		calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
 		return null;
 	}
+
+
+	private ExchangeService getService(Scheduler sch) {
+		switch (sch.getShedulerName()) {
+		case ServicesConstants.GOOGLE_SERVICE_NAME:
+
+			break;
+		case ServicesConstants.OUTLOOK_SERVICE_NAME:
+
+			break;
+		}
+		ExchangeService service = null;
+		return service;
+	}
+
 }
+
 
 /*
  * private List<Folder> getFolderList(int moffset, int moffsetCal) throws
