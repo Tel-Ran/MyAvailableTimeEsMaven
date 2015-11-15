@@ -5,4 +5,5 @@ public interface ServicesConstants {
 	static final long MINUTE = 60*1000; // in milliseconds
 	static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	static final String DATE_FORMAT = "yyyy-MM-dd";
+	static final String OUTLOOK_SERVICE_NAME = "Outlook";
 }
