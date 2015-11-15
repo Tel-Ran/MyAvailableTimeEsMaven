@@ -10,5 +10,11 @@ public interface IExternalServices {
     List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) throws Throwable;
     List<Contact> getContacts(int userId, List<Scheduler> schedulers) throws Throwable; 
     boolean upload(int userId, UploadRequest request) throws Throwable;
-    DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable;          
+    DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable;
+    /**
+     * temporary method for testing Hessian SOAP service initial capabilities
+     * @return any string. If this string can receive Hessian-client, server works well 
+     * even without other methods ready
+     */
+    String testMethod();
 }

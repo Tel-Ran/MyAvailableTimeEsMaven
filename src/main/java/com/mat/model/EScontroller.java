@@ -66,4 +66,15 @@ public class EScontroller implements IExternalServices {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+     * temporary method for testing Hessian SOAP service initial capabilities
+     * @return text. If this text can receive Hessian-client, server works well 
+     * even without other methods ready
+     */
+	@Override
+	public String testMethod() {
+		return "If you see this hessian service works";
+	}
+
 }
