@@ -55,8 +55,8 @@ public class GoogleExternalServices implements IService {
 			    		  
 			      }
 		    	Contact contact=new Contact(entry.getName().getFullName().getValue(), currentEmail);
-		    	System.out.println(contact);
-		    	//Contact contact= new Contact(gContact.getName(),gContact.getPrimaryEmail());
+		    	//System.out.println(contact);
+		    	contacts.add(contact);
 		    }
 			
 		
@@ -65,7 +65,7 @@ public class GoogleExternalServices implements IService {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return contacts;
 
 	}
 
