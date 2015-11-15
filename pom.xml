@@ -133,7 +133,7 @@
 		</repository>
 	</repositories>
 	<build>
-		<finalName>OAuth2v1</finalName>
+		<finalName>ExternalServices</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
