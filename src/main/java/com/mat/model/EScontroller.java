@@ -2,6 +2,8 @@ package com.mat.model;
 
 import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.mat.interfaces.IExternalServices;
 import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
@@ -14,7 +16,12 @@ import com.google.api.client.auth.oauth2.Credential;
 
 public class EScontroller implements IExternalServices {
 
-	private ServicesAuthorization serAuth = new ServicesAuthorization();
+/**
+ * Letting Spring to make an instance of ServicesAuthorization class (settings in external_services-servlet.xml)  
+ */
+	@Autowired
+    ServicesAuthorization serAuth;
+	
 
 	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
 		return null;
