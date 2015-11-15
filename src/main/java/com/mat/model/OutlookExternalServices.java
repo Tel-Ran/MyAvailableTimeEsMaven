@@ -29,6 +29,7 @@ import microsoft.exchange.webservices.data.core.service.item.Appointment;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.FolderSchema;
 import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
+import microsoft.exchange.webservices.data.credential.WebCredentials;
 import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import microsoft.exchange.webservices.data.search.CalendarView;
@@ -154,7 +155,7 @@ public class OutlookExternalServices implements IService {
 		return view;
 	}
 
-	public Date dateAdd(Date startDateAppointment, int duration) {
+	private Date dateAdd(Date startDateAppointment, int duration) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDateAppointment);
 		cal.add(Calendar.MINUTE, duration);
@@ -162,6 +163,7 @@ public class OutlookExternalServices implements IService {
 	}
 
 	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
+		changeCredentials(credential);
 		String eventName = request.getMyCalendarName();
 		for (ExternalCalendar calendar : request.getCalendars()) {
 			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
@@ -177,6 +179,7 @@ public class OutlookExternalServices implements IService {
 	}
 
 	public DownloadEventsResponse download(Credential credential, DownloadEventsRequest request) throws Throwable {
+		changeCredentials(credential);
 		DownloadEventsResponse result = new DownloadEventsResponse();
 		List<ExternalCalendar> calendars = request.getCalendars();
 		List<DownloadEvent> events = new ArrayList<DownloadEvent>();
@@ -187,12 +190,19 @@ public class OutlookExternalServices implements IService {
 		return result;
 	}
 
+	private void changeCredentials(Credential credential) {
+		//for oauth2 uncomment next line and comment last line 
+		//service.setCredentials(new OAuth2Credentials(credential.getAccessToken()));
+		service.setCredentials(new WebCredentials("telran2015@telran.onmicrosoft.com", "12345.com"));
+	}
+
 	public List<Contact> getContacts(Credential credential) throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
+		changeCredentials(credential);
 		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
 		for (Folder folder : folders) {
 			calendars.add(getCalendarByFolder(folder));
