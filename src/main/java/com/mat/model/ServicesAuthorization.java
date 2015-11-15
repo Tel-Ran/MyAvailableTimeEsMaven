@@ -10,11 +10,12 @@ import com.mat.json.ExternalCalendar;
 import com.mat.json.Scheduler;
 
 
-public class ExternalServises extends EScontroller{
+public class ServicesAuthorization{
 	
 	/**
 	 * map of credentials
 	 */
+	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
 	
 
 	/**
