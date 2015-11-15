@@ -66,8 +66,6 @@ public class CalendarTesting {
      */
     public static Credential authorize() throws IOException {
         // Load client secrets.
-    	IFfdgdfg dfd = new IFfdgdfg();
-    	
         InputStream in =
             CalendarTesting.class.getResourceAsStream("resources/client_secret.json");
         GoogleClientSecrets clientSecrets =
@@ -106,7 +104,6 @@ public class CalendarTesting {
         com.google.api.services.calendar.Calendar service =
             getCalendarService();        
         IExternalServices gService=new GoogleExternalServices(service);
-        
         List<ExternalCalendar> GoogleCalendars= gService.getCalendars();
         for (ExternalCalendar externalCalendar : GoogleCalendars) {
 			System.out.println(externalCalendar.toString());

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.*;
 import java.util.*;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
@@ -259,6 +260,26 @@ public class GoogleExternalServices implements IExternalServices {
 			service.events().delete(calendarId, eventId).execute();
 		}
 
+	}
+
+	public Credential getCredential(int userId, Scheduler scheduler) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Contact> getContacts(int UserId, List<Scheduler> schedulers) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/*
