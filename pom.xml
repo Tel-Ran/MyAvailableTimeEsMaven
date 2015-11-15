@@ -8,11 +8,7 @@
 	<name>External Services For MyAvailableTime project</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
-		<dependency>
-			<groupId>com.google.http-client</groupId>
-			<artifactId>google-http-client</artifactId>
-			<version>1.13.1-beta</version>
-		</dependency>
+		
 <dependency>
 	<groupId>com.google.gdata</groupId>
 	<artifactId>core</artifactId>
