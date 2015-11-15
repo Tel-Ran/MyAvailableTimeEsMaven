@@ -8,6 +8,8 @@ import com.google.api.client.auth.oauth2.Credential;
 
 
 public class EScontroller implements IExternalServices {
+
+	private ServicesAuthorization serAuth = new ServicesAuthorization();
 	
 		public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
 			return null;
@@ -20,7 +22,7 @@ public class EScontroller implements IExternalServices {
 		}
 
 	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
-		// TODO Auto-generated method stub
+		serAuth.setCredential(userId, scheduler, credential);
 		
 	}
 
