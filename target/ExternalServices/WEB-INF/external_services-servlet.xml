@@ -8,8 +8,14 @@
   
   
   
-<!-- components of the books application service getting result of any query -->
-<bean id="controller" class="com.mat.model.EScontroller" > <!-- class for calculator application model -->
+<!-- components of the External Services getting result of any query -->
+
+<!-- object of class ServicesAuthorizations for getting and settings credentials -->
+<bean id="serAuth" class="com.mat.model.ServicesAuthorization" > </bean>
+
+
+<!-- class for External Services controller model -->
+<bean id="controller" class="com.mat.model.EScontroller" > 
 </bean>
 <!-- ********** -->
 
