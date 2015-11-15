@@ -9,7 +9,6 @@ import com.google.api.client.auth.oauth2.Credential;
 
 public class EScontroller implements IExternalServices {
 	
-	//HashMap<Integer, HashMap<String, Credential>> credentials = new HashMap<Integer, HashMap<String, Credential>>();
 	HashMap<Integer, HashMap<Scheduler, List<ExternalCalendar>>> calendars = new HashMap<Integer, HashMap<Scheduler,List<ExternalCalendar>>>();
 	HashMap<Integer, HashMap<Scheduler, List<Contact>>> contacts = new HashMap<Integer, HashMap<Scheduler,List<Contact>>>(); 
 	
