@@ -1,2 +1,5 @@
 /classes/
 /test-classes/
+/m2e-wtp/
+/maven-archiver/
+/ExternalServices.war
