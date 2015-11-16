@@ -219,19 +219,6 @@ public class OutlookExternalServices implements IService {
 	}
 
 
-	private ExchangeService getService(Scheduler sch) {
-		switch (sch.getShedulerName()) {
-		case ServicesConstants.GOOGLE_SERVICE_NAME:
-
-			break;
-		case ServicesConstants.OUTLOOK_SERVICE_NAME:
-
-			break;
-		}
-		ExchangeService service = null;
-		return service;
-	}
-
 }
 
 
