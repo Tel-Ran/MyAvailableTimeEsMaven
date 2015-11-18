@@ -6,7 +6,7 @@ import java.util.List;
 public class UploadRequest {
     String myCalendarName;
     int duration;// time period in minutes;
-    List<Date> slots; //list of dates from which the selected slots begin
+    List<Slot> slots; //list of dates from which the selected slots begin
     List<ExternalCalendar> calendars; //calendars to where we uploading
     int userId;
     
@@ -16,7 +16,7 @@ public class UploadRequest {
 	public int getDuration() {
 		return duration;
 	}
-	public List<Date> getSlots() {
+	public List<Slot> getSlots() {
 		return slots;
 	}
 	public List<ExternalCalendar> getCalendars() {
@@ -32,7 +32,7 @@ public class UploadRequest {
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
-	public void setSlots(List<Date> slots) {
+	public void setSlots(List<Slot> slots) {
 		this.slots = slots;
 	}
 	public void setCalendars(List<ExternalCalendar> calendars) {

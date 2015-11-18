@@ -8,16 +8,18 @@ import java.util.List;
 import com.google.api.client.auth.oauth2.Credential;
 import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
-import com.mat.json.Contact;
 import com.mat.json.DownloadEvent;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
 import com.mat.json.ExternalCalendar;
+import com.mat.json.Person;
 import com.mat.json.Scheduler;
+import com.mat.json.Slot;
 import com.mat.json.UploadRequest;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
+import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.enumeration.property.BasePropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.enumeration.search.FolderTraversal;
@@ -41,6 +43,8 @@ import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
 public class OutlookExternalServices implements IService {
+	private static final ExchangeService DEFAULT_OUTLOOK_SERVICE = new ExchangeService(
+			ExchangeVersion.Exchange2010_SP2);;
 	ExchangeService service;
 	List<Folder> folders;
 
@@ -49,6 +53,15 @@ public class OutlookExternalServices implements IService {
 	}
 
 	public OutlookExternalServices(ExchangeService service) {
+		initService(service);
+	}
+
+	public OutlookExternalServices() {
+		initService(DEFAULT_OUTLOOK_SERVICE);
+	}
+
+	private void initService(ExchangeService service) {
+
 		this.service = service;
 		try {
 			folders = getFolderList();
@@ -164,13 +177,15 @@ public class OutlookExternalServices implements IService {
 	}
 
 	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
+
 		changeCredentials(credential);
 		String eventName = request.getMyCalendarName();
 		for (ExternalCalendar calendar : request.getCalendars()) {
 			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
 				Folder folder = getFolderByName(calendar.getCalendarName());
 				clearPreviousEvents(folder.getId(), eventName);
-				for (Date startDate : request.getSlots()) {
+				for (Slot slot : request.getSlots()) {
+					Date startDate = slot.getBeginning();
 					Date endDate = dateAdd(startDate, request.getDuration());
 					createAppointment(folder, eventName, "", startDate, endDate);
 				}
@@ -192,12 +207,13 @@ public class OutlookExternalServices implements IService {
 	}
 
 	private void changeCredentials(Credential credential) {
-		//for oauth2 uncomment next line and comment last line 
-		//service.setCredentials(new OAuth2Credentials(credential.getAccessToken()));
+		// for oauth2 uncomment next line and comment last line
+		// service.setCredentials(new
+		// OAuth2Credentials(credential.getAccessToken()));
 		service.setCredentials(new WebCredentials("telran2015@telran.onmicrosoft.com", "12345.com"));
 	}
 
-	public List<Contact> getContacts(Credential credential) throws Throwable {
+	public List<Person> getContacts(Credential credential) throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -218,9 +234,7 @@ public class OutlookExternalServices implements IService {
 		return null;
 	}
 
-
 }
-
 
 /*
  * private List<Folder> getFolderList(int moffset, int moffsetCal) throws

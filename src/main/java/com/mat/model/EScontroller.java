@@ -28,7 +28,7 @@ public class EScontroller implements IExternalServices {
 
 	}
 
-	public List<Contact> getContacts(int userId, List<Scheduler> schedulers) {
+	public List<Person> getContacts(int userId, List<Scheduler> schedulers) {
 		return null;
 
 	}

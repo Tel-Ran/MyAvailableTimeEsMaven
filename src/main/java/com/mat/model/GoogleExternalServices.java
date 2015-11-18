@@ -17,6 +17,7 @@ import com.mat.json.Contact;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
 import com.mat.json.ExternalCalendar;
+import com.mat.json.Person;
 import com.mat.json.Scheduler;
 import com.mat.json.UploadRequest;
 
@@ -32,7 +33,7 @@ public class GoogleExternalServices implements IService {
 		return null;
 	}
 
-	public List<Contact> getContacts(Credential credential) throws Throwable {
+	public List<Person> getContacts(Credential credential) throws Throwable {
 		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
 		myService.setOAuth2Credentials(credential);
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
