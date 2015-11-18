@@ -44,7 +44,7 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
 public class OutlookExternalServices implements IService {
 	private static final ExchangeService DEFAULT_OUTLOOK_SERVICE = new ExchangeService(
-			ExchangeVersion.Exchange2010_SP2);;
+			ExchangeVersion.Exchange2010_SP2);
 	ExchangeService service;
 	List<Folder> folders;
 
@@ -61,7 +61,6 @@ public class OutlookExternalServices implements IService {
 	}
 
 	private void initService(ExchangeService service) {
-
 		this.service = service;
 		try {
 			folders = getFolderList();
@@ -233,7 +232,6 @@ public class OutlookExternalServices implements IService {
 		calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
 		return null;
 	}
-
 }
 
 /*

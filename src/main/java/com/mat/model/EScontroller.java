@@ -16,12 +16,12 @@ import com.google.api.client.auth.oauth2.Credential;
 
 public class EScontroller implements IExternalServices {
 
-/**
- * Letting Spring to make an instance of ServicesAuthorization class (settings in external_services-servlet.xml)  
- */
+	/**
+	 * Letting Spring to make an instance of ServicesAuthorization class
+	 * (settings in external_services-servlet.xml)
+	 */
 	@Autowired
-    ServicesAuthorization serAuth;
-	
+	ServicesAuthorization serAuth;
 
 	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
 		return null;
@@ -43,8 +43,7 @@ public class EScontroller implements IExternalServices {
 		return null;
 	}
 
-	
-	//still not working
+	// TODO: need to be revised
 	public boolean upload(int userId, UploadRequest request) throws Throwable {
 		List<Scheduler> schedulers = new ArrayList<Scheduler>();
 		Scheduler scheduler = new Scheduler();
@@ -53,13 +52,24 @@ public class EScontroller implements IExternalServices {
 		scheduler = new Scheduler();
 		scheduler.setShedulerName(ServicesConstants.OUTLOOK_SERVICE_NAME);
 		schedulers.add(scheduler);
-		ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
+		boolean res = true;
 		for (Scheduler sch : schedulers) {
-			IService iService = new OutlookExternalServices(service);
+			IService iService = null;
+			switch (sch.getShedulerName()) {
+			case ServicesConstants.GOOGLE_SERVICE_NAME:
+				iService = new GoogleExternalServices();
+				break;
+			case ServicesConstants.OUTLOOK_SERVICE_NAME:
+				iService = new OutlookExternalServices();
+				break;
+			default:
+				break;
+			}
 			Credential credential = serAuth.getCredential(userId, scheduler);
-			iService.upload(credential, request);
+			res = res && iService.upload(credential, request);
 		}
-		return false;
+		//TODO: bad because if cycle was empty returns true. need to improve
+		return res;
 	}
 
 	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
@@ -68,10 +78,11 @@ public class EScontroller implements IExternalServices {
 	}
 
 	/**
-     * temporary method for testing Hessian SOAP service initial capabilities
-     * @return text. If this text can receive Hessian-client, server works well 
-     * even without other methods ready
-     */
+	 * temporary method for testing Hessian SOAP service initial capabilities
+	 * 
+	 * @return text. If this text can receive Hessian-client, server works well
+	 *         even without other methods ready
+	 */
 	@Override
 	public String testMethod() {
 		return "If you see this hessian service works";
