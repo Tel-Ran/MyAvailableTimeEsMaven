@@ -13,7 +13,6 @@ import com.google.gdata.data.contacts.ContactFeed;
 import com.google.gdata.data.extensions.Email;
 import com.google.gdata.util.ServiceException;
 import com.mat.interfaces.IService;
-import com.mat.json.Contact;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
 import com.mat.json.ExternalCalendar;
@@ -39,7 +38,7 @@ public class GoogleExternalServices implements IService {
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
 	    Query myQuery = new Query(feedUrl);
 	    myQuery.setMaxResults(3000);
-	    List<Contact> contacts=new ArrayList<Contact>();
+	    List<Person> persons=new ArrayList<Person>();
 	    try {
 			ContactFeed resultFeed = myService.query(myQuery, ContactFeed.class);
 			
@@ -47,17 +46,19 @@ public class GoogleExternalServices implements IService {
 		    {
 		    	String currentEmail="";
 		      //if(!entry.hasName() || !entry.getName().hasFullName()) continue;
-		    	if (!entry.hasEmailAddresses()) continue;
+		    	if (!entry.hasEmailAddresses()) continue; //if contact don`t have email - not taking it
 		    	for(Email email : entry.getEmailAddresses()){
-			    	  //gContact.addEmail(email.getAddress());		    	  
-			    	  if(email.getPrimary())
+		    		if(email.getPrimary())
 			    		  currentEmail=email.getAddress();
-			    		  //gContact.setPrimaryEmail(email.getAddress());
-			    		  
-			      }
-		    	Contact contact=new Contact(entry.getName().getFullName().getValue(), currentEmail);
-		    	//System.out.println(contact);
-		    	contacts.add(contact);
+   		  
+			    }
+		    	//Contact contact=new Contact(entry.getName().getFullName().getValue(), currentEmail);
+		    	Person person =new Person();
+		    	person.setEmail(currentEmail);
+		    	person.setFirstName(entry.getName().getGivenName().getValue());
+		    	person.setLastName(entry.getName().getFamilyName().getValue());
+		    	//System.out.println(person);
+		    	persons.add(person);
 		    }
 			
 		
@@ -66,7 +67,7 @@ public class GoogleExternalServices implements IService {
 			e.printStackTrace();
 		}
 		
-		return contacts;
+		return persons;
 
 	}
 
