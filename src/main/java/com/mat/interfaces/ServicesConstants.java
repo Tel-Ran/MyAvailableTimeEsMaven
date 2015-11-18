@@ -6,4 +6,5 @@ public interface ServicesConstants {
 	static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	static final String DATE_FORMAT = "yyyy-MM-dd";
 	static final String OUTLOOK_SERVICE_NAME = "Outlook";
+	static final String APPLICATION_NAME ="MAT";
 }

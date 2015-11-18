@@ -1,11 +1,31 @@
 package com.mat.model;
 
+import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
+
+
+
+
+
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.Events;
 import com.google.gdata.client.Query;
 import com.google.gdata.client.contacts.ContactsService;
 import com.google.gdata.data.contacts.ContactEntry;
@@ -13,24 +33,93 @@ import com.google.gdata.data.contacts.ContactFeed;
 import com.google.gdata.data.extensions.Email;
 import com.google.gdata.util.ServiceException;
 import com.mat.interfaces.IService;
+import com.mat.interfaces.ServicesConstants;
+import com.mat.json.DownloadEvent;
 import com.mat.json.DownloadEventsRequest;
 import com.mat.json.DownloadEventsResponse;
 import com.mat.json.ExternalCalendar;
 import com.mat.json.Person;
 import com.mat.json.Scheduler;
+import com.mat.json.Slot;
 import com.mat.json.UploadRequest;
 
 public class GoogleExternalServices implements IService {
 
+	private static HttpTransport HTTP_TRANSPORT;
+	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+	
 	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
-		// TODO Auto-generated method stub
-		return false;
+		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+        .setApplicationName(ServicesConstants.APPLICATION_NAME)
+        .build();		
+		
+		String eventName = request.getMyCalendarName();
+		for (ExternalCalendar calendar : request.getCalendars()) {
+			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.GOOGLE_SERVICE_NAME)) {
+				String calendarId = getCalendarId(service, calendar.getCalendarName());
+				clearPreviousEvents(service, calendarId, eventName);
+				for (Slot slot : request.getSlots()) {		
+					Date startDate= slot.getBeginning();
+					Date endDate = new Date(startDate.getTime() + request.getDuration() * ServicesConstants.MINUTE);					
+					addEvent(service, startDate, endDate, calendarId, eventName);					
+				}
+			}
+		} 
+		return true;	
 	}
 
 	public DownloadEventsResponse download(Credential credential, DownloadEventsRequest request) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
+		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+        .setApplicationName(ServicesConstants.APPLICATION_NAME)
+        .build();	
+		
+		DownloadEventsResponse response = new DownloadEventsResponse();
+		DateTime startInterval = new DateTime(request.getFromDate());
+		DateTime endInterval = new DateTime(request.getToDate());
+
+		List<DownloadEvent> eventsResult = new ArrayList<DownloadEvent>();		
+		for (ExternalCalendar calendar : request.getCalendars()) {
+			if (calendar.getCalendarService().equalsIgnoreCase(
+					ServicesConstants.GOOGLE_SERVICE_NAME)) {
+				String calendarId = getCalendarId(service, calendar.getCalendarName());
+				// getting events from calendarId and add them to eventsResult
+				String pageToken = null;
+				List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
+				do {
+					Events events = service.events().list(calendarId)
+							.setTimeMin(startInterval)
+							.setTimeMax(endInterval)
+							.setPageToken(pageToken)
+							.execute();
+					List<Event> items = events.getItems();
+					for (Event event : items) {
+						DownloadEvent eventResult = new DownloadEvent();						
+						// adding recurrence events:
+						// getRecurringEventId() - ссылка на id родителя события
+						if (event.getRecurrence() != null) {
+							//List<String> rules= event.getRecurrence(); // RRULE, EXRULE, RDATE and EXDATE 
+							List<DownloadEvent> recEvents=getRecEvents(service, request, event,calendarId, startInterval, endInterval,calendar);
+							for (DownloadEvent recEvent : recEvents) {
+								eventsResult.add(recEvent);
+							}
+						}
+						else{ //adding event without recurrence							
+							eventResult.setCalendar(calendar);													
+							eventResult.setBeginning(getDateFromDT(event.getStart()));												
+							eventResult.setEnding(getDateFromDT(event.getEnd()));							
+							eventResult.setEventName(event.getSummary());
+							eventsResult.add(eventResult);
+						}
+					}
+					pageToken = events.getNextPageToken();
+				} while (pageToken != null);
+
+			}
+		}
+		response.setEvents(eventsResult);
+		return response;
 	}
+
 
 	public List<Person> getContacts(Credential credential) throws Throwable {
 		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
@@ -72,13 +161,112 @@ public class GoogleExternalServices implements IService {
 	}
 
 	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
+		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+        .setApplicationName(ServicesConstants.APPLICATION_NAME)
+        .build();
+		String pageToken = null;
+		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
+		do {
+			CalendarList calendarList = service.calendarList().list()
+					.setPageToken(pageToken).execute(); // throws exception if needs														
+			List<CalendarListEntry> items = calendarList.getItems();
+			for (CalendarListEntry calendarListEntry : items) {
+				ExternalCalendar newCalendar = new ExternalCalendar();
+				newCalendar.setCalendarName(calendarListEntry.getSummary());
+				newCalendar.setCalendarService(ServicesConstants.GOOGLE_SERVICE_NAME);
+				calendars.add(newCalendar);
+			}
+			pageToken = calendarList.getNextPageToken();
+		} while (pageToken != null);
+		return calendars;
+	}
+	
+	// if it is possible to get id by name without getting calendarList?..
+	private String getCalendarId(Calendar service, String calendarName) throws IOException {
+		String calendarId = null;
+		String pageToken = null;
+		do {
+			CalendarList calendarList = service.calendarList().list()
+					.setPageToken(pageToken).execute();
+			List<CalendarListEntry> items = calendarList.getItems();
+			for (CalendarListEntry calendarListEntry : items) {
+				if (calendarListEntry.getSummary().equals(calendarName))
+					calendarId = calendarListEntry.getId();
+			}
+			pageToken = calendarList.getNextPageToken();
+		} while (pageToken != null);
+		return calendarId;
+	}	
+		
+	// getting all events with (name=eventName in calendar=calendarId) and removing them
+	private void clearPreviousEvents(Calendar service, String calendarId, String eventName) throws IOException {
+		// Iterate over the events in the specified calendar
+		List<String> eventIds = new ArrayList<String>();
+		String pageToken = null;
+		do {
+			Events events = service.events().list(calendarId)
+					.setPageToken(pageToken).execute();
+			List<Event> items = events.getItems();
+			for (Event event : items) {
+				if (event.getSummary().equals(eventName))
+					eventIds.add(event.getId());
+			}
+			pageToken = events.getNextPageToken();
+		} while (pageToken != null);
+
+		for (String eventId : eventIds) {
+			service.events().delete(calendarId, eventId).execute();
+		}
+	}	
+	
+	//adding event to calendar=calendarId
+	private void addEvent(Calendar service, Date startDate, Date endDate, String calendarId,
+			String eventName) throws IOException {
+		Event event = new Event().setSummary(eventName);
+		DateTime startDateTime = new DateTime(startDate);
+		EventDateTime start = new EventDateTime().setDateTime(startDateTime);
+		// .setTimeZone("America/Los_Angeles");
+		event.setStart(start);
+		DateTime endDateTime = new DateTime(endDate);
+		EventDateTime end = new EventDateTime().setDateTime(endDateTime);
+		// .setTimeZone("America/Los_Angeles");
+		event.setEnd(end);
+		event = service.events().insert(calendarId, event).execute();		
 	}
 
-	public List<Scheduler> getAuthorizedSchedulers(int userId, List<Scheduler> schedulers) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
+	//converting Date from EventDateTime (both variants) to Date format
+	private Date getDateFromDT(EventDateTime dt) throws ParseException {
+		DateFormat formatDateTime = new SimpleDateFormat(ServicesConstants.DATETIME_FORMAT);
+		DateFormat formatDate = new SimpleDateFormat(ServicesConstants.DATE_FORMAT);
+		return (dt.getDateTime() == null) ? 
+				formatDate.parse(dt.getDate().toString()) : 
+				formatDateTime.parse(dt.getDateTime().toStringRfc3339());
+	}
+
+	private List<DownloadEvent> getRecEvents(Calendar service, DownloadEventsRequest request, Event event, String calendarId,
+		DateTime startInterval,DateTime endInterval,ExternalCalendar calendar) throws IOException, ParseException {
+		List<DownloadEvent> recEventsResult =new ArrayList<DownloadEvent>();
+		String pageToken1 = null;
+		do {
+			// getting recEvents from the given interval							
+			Events recEvents = service.events().instances(calendarId, event.getId())
+					.setTimeMin(startInterval)
+					.setTimeMax(endInterval)
+					.setPageToken(pageToken1).execute();
+			List<Event> recItems = recEvents.getItems();
+			for (Event recEvent : recItems) {
+				DownloadEvent recEventResult = new DownloadEvent();									
+				recEventResult.setCalendar(calendar);
+				recEventResult.setEventName(event.getSummary());													
+				recEventResult.setBeginning(getDateFromDT(recEvent.getStart()));
+				recEventResult.setEnding(getDateFromDT(recEvent.getEnd()));	
+				if(!recEvent.getId().equals(event.getId())) {
+					recEventsResult.add(recEventResult);										
+				}
+			}
+			pageToken1 = recEvents.getNextPageToken();
+		} while (pageToken1 != null);
+		return recEventsResult;
 	}
 
 }
