@@ -50,7 +50,7 @@ public class GoogleExternalServices implements IService {
 		    	for(Email email : entry.getEmailAddresses()){
 		    		if(email.getPrimary())
 			    		  currentEmail=email.getAddress();
-   		  
+ 
 			    }
 		    	//Contact contact=new Contact(entry.getName().getFullName().getValue(), currentEmail);
 		    	Person person =new Person();

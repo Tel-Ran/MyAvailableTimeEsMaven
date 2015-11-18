@@ -29,7 +29,22 @@ public class EScontroller implements IExternalServices {
 	}
 
 	public List<Person> getContacts(int userId, List<Scheduler> schedulers) {
-		return null;
+		List<Person> persons=new ArrayList<Person>();
+		for(Scheduler scheduler: schedulers){
+			Credential credential=serAuth.getCredential(userId, scheduler);
+			String className=scheduler.getShedulerName()+"ExternalServices";
+			List<Person> personsFromOneService = new ArrayList<Person>();
+			try {
+				IService iService = (IService) Class.forName(className).newInstance();
+				iService.getContacts(credential);
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			persons.addAll(personsFromOneService);
+		}
+		
+		return persons;
 
 	}
 
