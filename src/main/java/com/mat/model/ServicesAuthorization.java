@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.mat.interfaces.IExternalServices;
 import com.mat.json.Contact;
 import com.mat.json.ExternalCalendar;
@@ -15,24 +16,24 @@ public class ServicesAuthorization{
 	/**
 	 * map of credentials
 	 */
-	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
+	HashMap<Integer, HashMap<Scheduler, GoogleCredential>> credentials = new HashMap<Integer, HashMap<Scheduler, GoogleCredential>>();
 	
 
 	/**
 	 * get credential from map by userId and scheduler
 	 */
-	public Credential getCredential(int userId, Scheduler scheduler) {
+	public GoogleCredential getCredential(int userId, Scheduler scheduler) {
 
-		Credential credential = credentials.get(userId).get(scheduler);
+		GoogleCredential credential = credentials.get(userId).get(scheduler);
 		return credential;
 	}
 
 	/**
 	 * store credential to map
 	 */
-	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+	public void setCredential(int userId, Scheduler scheduler, GoogleCredential credential) {
 		
-		HashMap<Scheduler, Credential> tempMap = new HashMap<Scheduler, Credential>();
+		HashMap<Scheduler, GoogleCredential> tempMap = new HashMap<Scheduler, GoogleCredential>();
 		tempMap.put(scheduler, credential);
 		credentials.put(userId, tempMap);
 		
