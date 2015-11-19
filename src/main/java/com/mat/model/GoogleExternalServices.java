@@ -57,7 +57,7 @@ public class GoogleExternalServices implements IService {
 	
 	 	
 	private Credential getGoogleCredential(MatCredential credential) throws Throwable{
-		com.google.api.client.auth.oauth2.Credential googleCredential= 
+		Credential googleCredential= 
 				new GoogleCredential.Builder()
 					.setJsonFactory(JSON_FACTORY)
 					.setTransport(HTTP_TRANSPORT)
@@ -68,7 +68,7 @@ public class GoogleExternalServices implements IService {
 		return googleCredential;
 	}
 	
-	private Calendar getCalendarService(com.google.api.client.auth.oauth2.Credential googleCredential){
+	private Calendar getCalendarService(Credential googleCredential){
 		return new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleCredential)
         					.setApplicationName(ServicesConstants.APPLICATION_NAME)
         					.build();		
@@ -118,7 +118,7 @@ public class GoogleExternalServices implements IService {
 					for (Event event : items) {
 						DownloadEvent eventResult = new DownloadEvent();						
 						// adding recurrence events:
-						// getRecurringEventId() - СЃСЃС‹Р»РєР° РЅР° id СЂРѕРґРёС‚РµР»СЏ СЃРѕР±С‹С‚РёСЏ
+						// getRecurringEventId() - ссылка на id родителя события
 						if (event.getRecurrence() != null) {
 							//List<String> rules= event.getRecurrence(); // RRULE, EXRULE, RDATE and EXDATE 
 							List<DownloadEvent> recEvents=getRecEvents(service, request, event,calendarId, startInterval, endInterval,calendar);
@@ -146,13 +146,13 @@ public class GoogleExternalServices implements IService {
 
 	public List<Person> getContacts(MatCredential credential) throws Throwable {
 		Credential googleCredential = getGoogleCredential(credential);
-		ContactsService myService = new ContactsService("contacts");//РЅР° С‡С‚Рѕ РІР»РёСЏРµС‚ РёРјСЏ??
+		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
 		myService.setOAuth2Credentials(googleCredential);
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
 	    Query myQuery = new Query(feedUrl);
 	    myQuery.setMaxResults(3000);
 	    List<Person> persons=new ArrayList<Person>();
-	    
+	    try {
 			ContactFeed resultFeed = myService.query(myQuery, ContactFeed.class);
 			
 		    for(ContactEntry entry : resultFeed.getEntries())
@@ -175,7 +175,10 @@ public class GoogleExternalServices implements IService {
 		    }
 			
 		
-		
+		} catch (ServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return persons;
 
