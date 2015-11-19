@@ -9,12 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-
-
-
-
-
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;

@@ -23,9 +23,24 @@ public class EScontroller implements IExternalServices {
 	@Autowired
 	ServicesAuthorization serAuth;
 
-	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) {
-		return null;
-
+	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) throws Throwable {		
+		List<ExternalCalendar> calendars=new ArrayList<ExternalCalendar>();
+		for (Scheduler sch : schedulers) {
+			IService iService = null;
+			switch (sch.getShedulerName()) {
+			case ServicesConstants.GOOGLE_SERVICE_NAME:
+				iService = new GoogleExternalServices();
+				break;
+			case ServicesConstants.OUTLOOK_SERVICE_NAME:
+				iService = new OutlookExternalServices();
+				break;
+			default:
+				break;
+			}
+			Credential credential = serAuth.getCredential(userId, sch);
+			calendars.addAll(iService.getCalendars(credential));
+		}		
+		return calendars;
 	}
 
 	public List<Person> getContacts(int userId, List<Scheduler> schedulers) {
@@ -55,8 +70,13 @@ public class EScontroller implements IExternalServices {
 	}
 
 	public List<Scheduler> getAuthorizedSchedulers(int userId, List<Scheduler> schedulers) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
+		List<Scheduler> resultSchedulers=new ArrayList<Scheduler>();
+		for (Scheduler scheduler : schedulers) {
+			Credential credential = serAuth.getCredential(userId, scheduler);
+			if(credential!=null)
+				resultSchedulers.add(scheduler);
+		}
+		return resultSchedulers;
 	}
 
 	// TODO: need to be revised
@@ -81,7 +101,7 @@ public class EScontroller implements IExternalServices {
 			default:
 				break;
 			}
-			Credential credential = serAuth.getCredential(userId, scheduler);
+			Credential credential = serAuth.getCredential(userId, sch);
 			res = res && iService.upload(credential, request);
 		}
 		//TODO: bad because if cycle was empty returns true. need to improve
@@ -89,8 +109,32 @@ public class EScontroller implements IExternalServices {
 	}
 
 	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
+		List<Scheduler> schedulers = new ArrayList<Scheduler>();
+		Scheduler scheduler = new Scheduler();
+		scheduler.setShedulerName(ServicesConstants.GOOGLE_SERVICE_NAME);
+		schedulers.add(scheduler);
+		scheduler = new Scheduler();
+		scheduler.setShedulerName(ServicesConstants.OUTLOOK_SERVICE_NAME);
+		schedulers.add(scheduler);				
+		List<DownloadEvent> events=new ArrayList<DownloadEvent>();		
+		for (Scheduler sch : schedulers) {
+			IService iService = null;
+			switch (sch.getShedulerName()) {
+			case ServicesConstants.GOOGLE_SERVICE_NAME:
+				iService = new GoogleExternalServices();
+				break;
+			case ServicesConstants.OUTLOOK_SERVICE_NAME:
+				iService = new OutlookExternalServices();
+				break;
+			default:
+				break;
+			}
+			Credential credential = serAuth.getCredential(userId, sch);
+			events.addAll(iService.download(credential, request).getEvents());
+		}
+		DownloadEventsResponse response=new DownloadEventsResponse();
+		response.setEvents(events);
+		return response;
 	}
 
 	/**
