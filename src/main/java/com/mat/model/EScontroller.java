@@ -43,20 +43,16 @@ public class EScontroller implements IExternalServices {
 		return calendars;
 	}
 
-	public List<Person> getContacts(int userId, List<Scheduler> schedulers) {
+	public List<Person> getContacts(int userId, List<Scheduler> schedulers) throws Throwable {
 		List<Person> persons=new ArrayList<Person>();
 		for(Scheduler scheduler: schedulers){
 			Credential credential=serAuth.getCredential(userId, scheduler);
 			String className="com.mat.model."+scheduler.getShedulerName()+"ExternalServices";
 			List<Person> personsFromOneService = new ArrayList<Person>();
-			try {
-				IService iService = (IService) Class.forName(className).newInstance();
-				//System.out.println("created successfuly:"+className);
-				iService.getContacts(credential);
-			} catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			IService iService = (IService) Class.forName(className).newInstance();
+			//System.out.println("created successfuly:"+className);
+			personsFromOneService=iService.getContacts(credential);
 			persons.addAll(personsFromOneService);
 		}
 		
