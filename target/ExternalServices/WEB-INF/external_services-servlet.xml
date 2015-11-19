@@ -29,6 +29,12 @@
 <property name="serviceInterface" value="com.mat.interfaces.IExternalServices"></property> 
 </bean>
 
+
+<!-- interface of the service -->
+<property name="serviceInterface2" value="com.mat.interfaces.ITest"></property> 
+</bean>
+
+
 <!-- ********** -->
 <!-- mapping to the application service -->
 <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
