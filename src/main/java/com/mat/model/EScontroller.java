@@ -13,6 +13,7 @@ import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 
 public class EScontroller implements IExternalServices {
 
@@ -60,7 +61,7 @@ public class EScontroller implements IExternalServices {
 
 	}
 
-	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+	public void setCredential(int userId, Scheduler scheduler, GoogleCredential credential) {
 		serAuth.setCredential(userId, scheduler, credential);
 
 	}

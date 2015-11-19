@@ -13,7 +13,8 @@ public class TestController implements ITest {
 	
 	@Override
 	public GoogleCredential getCredential(int userId, Scheduler scheduler) {
-		return serAuth.getCredential(userId, scheduler);
+		return serAuth.
+				getCredential(userId, scheduler);
 		
 		
 	}
