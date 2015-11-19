@@ -3,11 +3,12 @@ package com.mat.model;
 import java.util.HashMap;
 import java.util.List;
 
-import com.google.api.client.auth.oauth2.Credential;
+//import com.google.api.client.auth.oauth2.Credential;
 import com.mat.interfaces.IExternalServices;
 import com.mat.json.Contact;
 import com.mat.json.ExternalCalendar;
 import com.mat.json.Scheduler;
+import com.mat.json.Credential;
 
 
 public class ServicesAuthorization{

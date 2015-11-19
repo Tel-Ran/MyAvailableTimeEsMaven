@@ -6,15 +6,23 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
@@ -28,24 +36,47 @@ import com.google.gdata.data.extensions.Email;
 import com.google.gdata.util.ServiceException;
 import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
-import com.mat.json.DownloadEvent;
-import com.mat.json.DownloadEventsRequest;
-import com.mat.json.DownloadEventsResponse;
-import com.mat.json.ExternalCalendar;
-import com.mat.json.Person;
-import com.mat.json.Scheduler;
-import com.mat.json.Slot;
-import com.mat.json.UploadRequest;
+import com.mat.json.*;
+
 
 public class GoogleExternalServices implements IService {
 
 	private static HttpTransport HTTP_TRANSPORT;
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+	private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);	
 	
-	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
-		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-        .setApplicationName(ServicesConstants.APPLICATION_NAME)
-        .build();		
+	static 	 
+	 {
+	        try {
+	            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();	           
+	        } catch (Throwable t) {
+	            t.printStackTrace();
+	            System.exit(1);
+	        }
+	    }
+	
+	 	
+	private com.google.api.client.auth.oauth2.Credential getGoogleCredential(com.mat.json.Credential credential) throws Throwable{
+		com.google.api.client.auth.oauth2.Credential googleCredential= 
+				new GoogleCredential.Builder()
+					.setJsonFactory(JSON_FACTORY)
+					.setTransport(HTTP_TRANSPORT)
+					.setClientSecrets(ServicesConstants.CLIENT_ID, ServicesConstants.CLIENT_SECRET)
+					.build();
+		googleCredential.setRefreshToken(credential.getRefreshToken()); // you need String refreshToken for this method
+		googleCredential.refreshToken();
+		return googleCredential;
+	}
+	
+	private Calendar getCalendarService(com.google.api.client.auth.oauth2.Credential googleCredential){
+		return new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, googleCredential)
+        					.setApplicationName(ServicesConstants.APPLICATION_NAME)
+        					.build();		
+	}
+	
+	public boolean upload(com.mat.json.Credential credential, UploadRequest request) throws Throwable {
+		
+		Calendar service = getCalendarService(getGoogleCredential(credential));
 		
 		String eventName = request.getMyCalendarName();
 		for (ExternalCalendar calendar : request.getCalendars()) {
@@ -62,10 +93,8 @@ public class GoogleExternalServices implements IService {
 		return true;	
 	}
 
-	public DownloadEventsResponse download(Credential credential, DownloadEventsRequest request) throws Throwable {
-		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-        .setApplicationName(ServicesConstants.APPLICATION_NAME)
-        .build();	
+	public DownloadEventsResponse download(com.mat.json.Credential credential, DownloadEventsRequest request) throws Throwable {
+		Calendar service = getCalendarService(getGoogleCredential(credential));
 		
 		DownloadEventsResponse response = new DownloadEventsResponse();
 		DateTime startInterval = new DateTime(request.getFromDate());
@@ -115,9 +144,10 @@ public class GoogleExternalServices implements IService {
 	}
 
 
-	public List<Person> getContacts(Credential credential) throws Throwable {
+	public List<Person> getContacts(com.mat.json.Credential credential) throws Throwable {
+		com.google.api.client.auth.oauth2.Credential googleCredential = getGoogleCredential(credential);
 		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
-		myService.setOAuth2Credentials(credential);
+		myService.setOAuth2Credentials(googleCredential);
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
 	    Query myQuery = new Query(feedUrl);
 	    myQuery.setMaxResults(3000);
@@ -154,10 +184,9 @@ public class GoogleExternalServices implements IService {
 
 	}
 
-	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
-		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-        .setApplicationName(ServicesConstants.APPLICATION_NAME)
-        .build();
+	public List<ExternalCalendar> getCalendars(com.mat.json.Credential credential) throws Throwable {
+		Calendar service = getCalendarService(getGoogleCredential(credential));
+		
 		String pageToken = null;
 		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
 		do {
@@ -262,5 +291,7 @@ public class GoogleExternalServices implements IService {
 		} while (pageToken1 != null);
 		return recEventsResult;
 	}
+
+	
 
 }

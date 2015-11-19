@@ -12,7 +12,7 @@ import com.mat.json.*;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 
-import com.google.api.client.auth.oauth2.Credential;
+//import com.google.api.client.auth.oauth2.Credential;
 
 public class EScontroller implements IExternalServices {
 
@@ -23,6 +23,7 @@ public class EScontroller implements IExternalServices {
 	@Autowired
 	ServicesAuthorization serAuth;
 
+	@Override
 	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) throws Throwable {		
 		List<ExternalCalendar> calendars=new ArrayList<ExternalCalendar>();
 		for (Scheduler sch : schedulers) {
@@ -43,6 +44,7 @@ public class EScontroller implements IExternalServices {
 		return calendars;
 	}
 
+	@Override
 	public List<Person> getContacts(int userId, List<Scheduler> schedulers) throws Throwable {
 		List<Person> persons=new ArrayList<Person>();
 		for(Scheduler scheduler: schedulers){
@@ -60,11 +62,12 @@ public class EScontroller implements IExternalServices {
 
 	}
 
+	@Override
 	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
 		serAuth.setCredential(userId, scheduler, credential);
-
 	}
-
+	
+	@Override
 	public List<Scheduler> getAuthorizedSchedulers(int userId, List<Scheduler> schedulers) throws Throwable {
 		List<Scheduler> resultSchedulers=new ArrayList<Scheduler>();
 		for (Scheduler scheduler : schedulers) {
@@ -76,6 +79,7 @@ public class EScontroller implements IExternalServices {
 	}
 
 	// TODO: need to be revised
+	@Override
 	public boolean upload(int userId, UploadRequest request) throws Throwable {
 		List<Scheduler> schedulers = new ArrayList<Scheduler>();
 		Scheduler scheduler = new Scheduler();
@@ -104,6 +108,7 @@ public class EScontroller implements IExternalServices {
 		return res;
 	}
 
+	@Override
 	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
 		List<Scheduler> schedulers = new ArrayList<Scheduler>();
 		Scheduler scheduler = new Scheduler();
@@ -143,5 +148,7 @@ public class EScontroller implements IExternalServices {
 	public String testMethod() {
 		return "If you see this hessian service works";
 	}
+
+	
 
 }
