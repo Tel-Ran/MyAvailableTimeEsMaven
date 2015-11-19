@@ -118,7 +118,7 @@ public class GoogleExternalServices implements IService {
 					for (Event event : items) {
 						DownloadEvent eventResult = new DownloadEvent();						
 						// adding recurrence events:
-						// getRecurringEventId() - ссылка на id родителя события
+						// getRecurringEventId() - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ id пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						if (event.getRecurrence() != null) {
 							//List<String> rules= event.getRecurrence(); // RRULE, EXRULE, RDATE and EXDATE 
 							List<DownloadEvent> recEvents=getRecEvents(service, request, event,calendarId, startInterval, endInterval,calendar);
@@ -146,17 +146,17 @@ public class GoogleExternalServices implements IService {
 
 	public List<Person> getContacts(MatCredential credential) throws Throwable {
 		Credential googleCredential = getGoogleCredential(credential);
-		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
+		ContactsService myService = new ContactsService("contacts");//пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ??
 		myService.setOAuth2Credentials(googleCredential);
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
 	    Query myQuery = new Query(feedUrl);
 	    myQuery.setMaxResults(3000);
 	    List<Person> persons=new ArrayList<Person>();
-	    try {
-			ContactFeed resultFeed = myService.query(myQuery, ContactFeed.class);
+	 
+		ContactFeed resultFeed = myService.query(myQuery, ContactFeed.class);
 			
-		    for(ContactEntry entry : resultFeed.getEntries())
-		    {
+		for(ContactEntry entry : resultFeed.getEntries())
+		{
 		    	String currentEmail="";
 		      //if(!entry.hasName() || !entry.getName().hasFullName()) continue;
 		    	if (!entry.hasEmailAddresses()) continue; //if contact don`t have email - not taking it
@@ -172,13 +172,9 @@ public class GoogleExternalServices implements IService {
 		    	person.setLastName(entry.getName().getFamilyName().getValue());
 		    	//System.out.println(person);
 		    	persons.add(person);
-		    }
+		}
 			
 		
-		} catch (ServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		return persons;
 
