@@ -38,7 +38,7 @@ public class EScontroller implements IExternalServices {
 			default:
 				break;
 			}
-			Credential credential = serAuth.getCredential(userId, sch);
+			MatCredential credential = serAuth.getCredential(userId, sch);
 			calendars.addAll(iService.getCalendars(credential));
 		}		
 		return calendars;
@@ -48,7 +48,7 @@ public class EScontroller implements IExternalServices {
 	public List<Person> getContacts(int userId, List<Scheduler> schedulers) throws Throwable {
 		List<Person> persons=new ArrayList<Person>();
 		for(Scheduler scheduler: schedulers){
-			Credential credential=serAuth.getCredential(userId, scheduler);
+			MatCredential credential=serAuth.getCredential(userId, scheduler);
 			String className="com.mat.model."+scheduler.getShedulerName()+"ExternalServices";
 			List<Person> personsFromOneService = new ArrayList<Person>();
 			
@@ -63,7 +63,7 @@ public class EScontroller implements IExternalServices {
 	}
 
 	@Override
-	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+	public void setCredential(int userId, Scheduler scheduler, MatCredential credential) {
 		serAuth.setCredential(userId, scheduler, credential);
 	}
 	
@@ -71,7 +71,7 @@ public class EScontroller implements IExternalServices {
 	public List<Scheduler> getAuthorizedSchedulers(int userId, List<Scheduler> schedulers) throws Throwable {
 		List<Scheduler> resultSchedulers=new ArrayList<Scheduler>();
 		for (Scheduler scheduler : schedulers) {
-			Credential credential = serAuth.getCredential(userId, scheduler);
+			MatCredential credential = serAuth.getCredential(userId, scheduler);
 			if(credential!=null)
 				resultSchedulers.add(scheduler);
 		}
@@ -101,7 +101,7 @@ public class EScontroller implements IExternalServices {
 			default:
 				break;
 			}
-			Credential credential = serAuth.getCredential(userId, sch);
+			MatCredential credential = serAuth.getCredential(userId, sch);
 			res = res && iService.upload(credential, request);
 		}
 		//TODO: bad because if cycle was empty returns true. need to improve
@@ -130,7 +130,7 @@ public class EScontroller implements IExternalServices {
 			default:
 				break;
 			}
-			Credential credential = serAuth.getCredential(userId, sch);
+			MatCredential credential = serAuth.getCredential(userId, sch);
 			events.addAll(iService.download(credential, request).getEvents());
 		}
 		DownloadEventsResponse response=new DownloadEventsResponse();

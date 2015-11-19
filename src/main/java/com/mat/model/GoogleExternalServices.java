@@ -56,7 +56,7 @@ public class GoogleExternalServices implements IService {
 	    }
 	
 	 	
-	private com.google.api.client.auth.oauth2.Credential getGoogleCredential(com.mat.json.Credential credential) throws Throwable{
+	private com.google.api.client.auth.oauth2.Credential getGoogleCredential(com.mat.json.MatCredential credential) throws Throwable{
 		com.google.api.client.auth.oauth2.Credential googleCredential= 
 				new GoogleCredential.Builder()
 					.setJsonFactory(JSON_FACTORY)
@@ -74,7 +74,7 @@ public class GoogleExternalServices implements IService {
         					.build();		
 	}
 	
-	public boolean upload(com.mat.json.Credential credential, UploadRequest request) throws Throwable {
+	public boolean upload(com.mat.json.MatCredential credential, UploadRequest request) throws Throwable {
 		
 		Calendar service = getCalendarService(getGoogleCredential(credential));
 		
@@ -93,7 +93,7 @@ public class GoogleExternalServices implements IService {
 		return true;	
 	}
 
-	public DownloadEventsResponse download(com.mat.json.Credential credential, DownloadEventsRequest request) throws Throwable {
+	public DownloadEventsResponse download(com.mat.json.MatCredential credential, DownloadEventsRequest request) throws Throwable {
 		Calendar service = getCalendarService(getGoogleCredential(credential));
 		
 		DownloadEventsResponse response = new DownloadEventsResponse();
@@ -144,7 +144,7 @@ public class GoogleExternalServices implements IService {
 	}
 
 
-	public List<Person> getContacts(com.mat.json.Credential credential) throws Throwable {
+	public List<Person> getContacts(com.mat.json.MatCredential credential) throws Throwable {
 		com.google.api.client.auth.oauth2.Credential googleCredential = getGoogleCredential(credential);
 		ContactsService myService = new ContactsService("contacts");//на что влияет имя??
 		myService.setOAuth2Credentials(googleCredential);
@@ -184,7 +184,7 @@ public class GoogleExternalServices implements IService {
 
 	}
 
-	public List<ExternalCalendar> getCalendars(com.mat.json.Credential credential) throws Throwable {
+	public List<ExternalCalendar> getCalendars(com.mat.json.MatCredential credential) throws Throwable {
 		Calendar service = getCalendarService(getGoogleCredential(credential));
 		
 		String pageToken = null;

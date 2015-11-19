@@ -9,7 +9,7 @@ import com.mat.interfaces.IExternalServices;
 import com.mat.json.Contact;
 import com.mat.json.ExternalCalendar;
 import com.mat.json.Scheduler;
-import com.mat.json.Credential;
+import com.mat.json.MatCredential;
 
 
 public class ServicesAuthorization{
@@ -17,24 +17,24 @@ public class ServicesAuthorization{
 	/**
 	 * map of credentials
 	 */
-	HashMap<Integer, HashMap<Scheduler, Credential>> credentials = new HashMap<Integer, HashMap<Scheduler, Credential>>();
+	HashMap<Integer, HashMap<Scheduler, MatCredential>> credentials = new HashMap<Integer, HashMap<Scheduler, MatCredential>>();
 	
 
 	/**
 	 * get credential from map by userId and scheduler
 	 */
-	public Credential getCredential(int userId, Scheduler scheduler) {
+	public MatCredential getCredential(int userId, Scheduler scheduler) {
 
-		Credential credential = credentials.get(userId).get(scheduler);
+		MatCredential credential = credentials.get(userId).get(scheduler);
 		return credential;
 	}
 
 	/**
 	 * store credential to map
 	 */
-	public void setCredential(int userId, Scheduler scheduler, Credential credential) {
+	public void setCredential(int userId, Scheduler scheduler, MatCredential credential) {
 		
-		HashMap<Scheduler, Credential> tempMap = new HashMap<Scheduler, Credential>();
+		HashMap<Scheduler, MatCredential> tempMap = new HashMap<Scheduler, MatCredential>();
 		tempMap.put(scheduler, credential);
 		credentials.put(userId, tempMap);
 		

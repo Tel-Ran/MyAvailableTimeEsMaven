@@ -2,7 +2,7 @@ package com.mat.json;
 
 import java.util.Date;
 
-public class Credential {
+public class MatCredential {
 	String refreshToken;
 	String accessToken;
 	Date expirationTime;
