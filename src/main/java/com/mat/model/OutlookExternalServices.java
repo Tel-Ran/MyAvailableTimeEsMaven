@@ -1,22 +1,8 @@
 package com.mat.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import com.google.api.client.auth.oauth2.Credential;
 import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
-import com.mat.json.DownloadEvent;
-import com.mat.json.DownloadEventsRequest;
-import com.mat.json.DownloadEventsResponse;
-import com.mat.json.ExternalCalendar;
-import com.mat.json.Person;
-import com.mat.json.Scheduler;
-import com.mat.json.Slot;
-import com.mat.json.UploadRequest;
-
+import com.mat.json.*;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
@@ -35,12 +21,10 @@ import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
 import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
-import microsoft.exchange.webservices.data.search.CalendarView;
-import microsoft.exchange.webservices.data.search.FindFoldersResults;
-import microsoft.exchange.webservices.data.search.FindItemsResults;
-import microsoft.exchange.webservices.data.search.FolderView;
-import microsoft.exchange.webservices.data.search.ItemView;
+import microsoft.exchange.webservices.data.search.*;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
+
+import java.util.*;
 
 public class OutlookExternalServices implements IService {
 	private static final ExchangeService DEFAULT_OUTLOOK_SERVICE = new ExchangeService(
@@ -175,7 +159,7 @@ public class OutlookExternalServices implements IService {
 		return cal.getTime();
 	}
 
-	public boolean upload(Credential credential, UploadRequest request) throws Throwable {
+	public boolean upload(MatCredential credential, UploadRequest request) throws Throwable {
 
 		changeCredentials(credential);
 		String eventName = request.getMyCalendarName();
@@ -193,7 +177,7 @@ public class OutlookExternalServices implements IService {
 		return true;
 	}
 
-	public DownloadEventsResponse download(Credential credential, DownloadEventsRequest request) throws Throwable {
+	public DownloadEventsResponse download(MatCredential credential, DownloadEventsRequest request) throws Throwable {
 		changeCredentials(credential);
 		DownloadEventsResponse result = new DownloadEventsResponse();
 		List<ExternalCalendar> calendars = request.getCalendars();
@@ -205,19 +189,19 @@ public class OutlookExternalServices implements IService {
 		return result;
 	}
 
-	private void changeCredentials(Credential credential) {
+	private void changeCredentials(MatCredential credential) {
 		// for oauth2 uncomment next line and comment last line
 		// service.setCredentials(new
 		// OAuth2Credentials(credential.getAccessToken()));
 		service.setCredentials(new WebCredentials("telran2015@telran.onmicrosoft.com", "12345.com"));
 	}
 
-	public List<Person> getContacts(Credential credential) throws Throwable {
+	public List<Person> getContacts(MatCredential credential) throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public List<ExternalCalendar> getCalendars(Credential credential) throws Throwable {
+	public List<ExternalCalendar> getCalendars(MatCredential credential) throws Throwable {
 		changeCredentials(credential);
 		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
 		for (Folder folder : folders) {
