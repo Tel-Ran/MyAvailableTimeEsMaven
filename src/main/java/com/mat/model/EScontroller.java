@@ -1,16 +1,11 @@
 package com.mat.model;
 
-import java.util.*;
-
+import com.mat.interfaces.*;
+import com.mat.json.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.mat.interfaces.IExternalServices;
-import com.mat.interfaces.IService;
-import com.mat.interfaces.ServicesConstants;
-import com.mat.json.*;
-
-import microsoft.exchange.webservices.data.core.ExchangeService;
-import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
+import java.util.ArrayList;
+import java.util.List;
 
 //import com.google.api.client.auth.oauth2.Credential;
 
@@ -81,13 +76,7 @@ public class EScontroller implements IExternalServices {
 	// TODO: need to be revised
 	@Override
 	public boolean upload(int userId, UploadRequest request) throws Throwable {
-		List<Scheduler> schedulers = new ArrayList<Scheduler>();
-		Scheduler scheduler = new Scheduler();
-		scheduler.setShedulerName(ServicesConstants.GOOGLE_SERVICE_NAME);
-		schedulers.add(scheduler);
-		scheduler = new Scheduler();
-		scheduler.setShedulerName(ServicesConstants.OUTLOOK_SERVICE_NAME);
-		schedulers.add(scheduler);
+		List<Scheduler> schedulers = getSchedulers();
 		boolean res = true;
 		for (Scheduler sch : schedulers) {
 			IService iService = null;
@@ -108,15 +97,20 @@ public class EScontroller implements IExternalServices {
 		return res;
 	}
 
-	@Override
-	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
+	private List<Scheduler> getSchedulers() {
 		List<Scheduler> schedulers = new ArrayList<Scheduler>();
 		Scheduler scheduler = new Scheduler();
 		scheduler.setShedulerName(ServicesConstants.GOOGLE_SERVICE_NAME);
 		schedulers.add(scheduler);
 		scheduler = new Scheduler();
 		scheduler.setShedulerName(ServicesConstants.OUTLOOK_SERVICE_NAME);
-		schedulers.add(scheduler);				
+		schedulers.add(scheduler);
+		return schedulers;
+	}
+
+	@Override
+	public DownloadEventsResponse download(int userId, DownloadEventsRequest request) throws Throwable {
+		List<Scheduler> schedulers = getSchedulers();
 		List<DownloadEvent> events=new ArrayList<DownloadEvent>();		
 		for (Scheduler sch : schedulers) {
 			IService iService = null;
