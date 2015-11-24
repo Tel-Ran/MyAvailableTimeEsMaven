@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+//Spring test library
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -21,7 +22,7 @@ import com.mat.json.MatCredential;
 import com.mat.json.Scheduler;
 import com.mat.model.ServicesAuthorization;
 
-
+//spring-Test annotations for adding Spring context to text
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ContextConfiguration(locations = {"file:target/ExternalServices/WEB-INF/external_services-servlet.xml"})
@@ -39,27 +40,24 @@ public class ServiceAuthorizationTest {
 	private static MatCredential credential;
 	private static Scheduler scheduler;
 
-	String testAnswer = "If you see this hessian service works";
-
-/*public HessianProxyFactoryBean iExternalServices() {
-	    HessianProxyFactoryBean factory = new HessianProxyFactoryBean();
-	    factory.setServiceUrl("http://localhost:8080/MyAvailableTimeEsMaven/external_services.service");
-	    factory.setServiceInterface(IExternalServices.class);
-	    return factory;
-*/	/*}*/
+	//Adding bean of class from xml Spring configuration
 	@Autowired
 	private ServicesAuthorization serAuth;
 	
+	/**
+	 * Preparing object for tests
+	 * @throws Exception
+	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-		gCredential = new GoogleCredential.Builder().setJsonFactory(Constants.JSON_FACTORY)
-			     .setTransport(Constants.HTTP_TRANSPORT).setClientSecrets(Constants.CLIENT_ID, Constants.CLIENT_SECRET).build();
-			credential = new MatCredential();
-			credential.setAccessToken(Constants.ACCESS_TOKEN);
-			credential.setRefreshToken(Constants.REFRESH_TOKEN);
-			credential.setExpirationTime(EXP_TIME);
-			scheduler = new Scheduler();
+		//Making MatCredential class instance
+		credential = new MatCredential();
+		credential.setAccessToken(Constants.ACCESS_TOKEN);
+		credential.setRefreshToken(Constants.REFRESH_TOKEN);
+		credential.setExpirationTime(EXP_TIME);
+
+		//Making Schedulet class instance
+		scheduler = new Scheduler();
 			scheduler.setAccountName(ACCOUNT_NAME);
 			scheduler.setShedulerName(SCHEDULER_NAME);
 			
