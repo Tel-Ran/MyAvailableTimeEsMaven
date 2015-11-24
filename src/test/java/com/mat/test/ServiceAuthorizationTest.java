@@ -9,7 +9,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.mat.interfaces.Constants;
@@ -18,9 +22,9 @@ import com.mat.json.Scheduler;
 import com.mat.model.ServicesAuthorization;
 
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-//@ContextConfiguration(locations = {"beans.xml"})
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ContextConfiguration(locations = {"file:target/ExternalServices/WEB-INF/external_services-servlet.xml"})
 public class ServiceAuthorizationTest {
 	
 	private static final String ACCOUNT_NAME = "google";
@@ -80,6 +84,5 @@ public class ServiceAuthorizationTest {
 		MatCredential credRes = serAuth.getCredential(USER_ID, scheduler);	
 		assertEquals(credential, credRes);
 	}
-	
 
 }

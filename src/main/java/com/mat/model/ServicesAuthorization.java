@@ -20,6 +20,10 @@ public class ServicesAuthorization{
 	HashMap<Integer, HashMap<Scheduler, MatCredential>> credentials = new HashMap<Integer, HashMap<Scheduler, MatCredential>>();
 	
 
+	public ServicesAuthorization() {
+		super();
+	}
+
 	/**
 	 * get credential from map by userId and scheduler
 	 */
