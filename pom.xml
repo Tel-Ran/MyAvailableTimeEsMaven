@@ -188,7 +188,6 @@
 			<plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-resources-plugin</artifactId>
-    <version>2.7</version>
     <configuration>
          <encoding>UTF-8</encoding>
     </configuration>
@@ -197,4 +196,4 @@
 		</plugins>
 
 	</build>
-</project>
+</project>	
