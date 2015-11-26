@@ -2,7 +2,9 @@ package com.mat.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,6 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.mat.interfaces.Constants;
 import com.mat.json.MatCredential;
+import com.mat.json.Person;
 import com.mat.json.Scheduler;
 import com.mat.model.EScontroller;
 import com.mat.model.ServicesAuthorization;
@@ -41,6 +44,7 @@ public class GoogleContactsTest {
 	private static EScontroller eScontroller;
 	private static MatCredential credential;
 	private static Scheduler scheduler;
+	private static List<Scheduler> schedulers;
 
 	//Adding bean of class from xml Spring configuration
 	@Autowired
@@ -62,7 +66,8 @@ public class GoogleContactsTest {
 		scheduler = new Scheduler();
 		scheduler.setAccountName(ACCOUNT_NAME);
 		scheduler.setShedulerName(SCHEDULER_NAME);
-		
+		schedulers = new ArrayList<Scheduler>();
+		schedulers.add(scheduler);
 		eScontroller = new EScontroller();
 			
 	}
@@ -84,7 +89,19 @@ public class GoogleContactsTest {
 		serAuth.setCredential(USER_ID, scheduler, credential);
 		MatCredential credRes = serAuth.getCredential(USER_ID, scheduler);
 		System.out.println("test1");
-		//eScontroller.setCredential(USER_ID, scheduler, credential);
+		eScontroller.setCredential(USER_ID, scheduler, credential);
+		
+		try {
+			List<Person> persons= eScontroller.getContacts(USER_ID, schedulers);
+			System.out.println(persons.size());
+			for (Person person : persons) {
+				System.out.println(person);
+			}
+			System.out.println(persons);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//eScontroller.getContacts(USER_ID, schedulers);
 		assertEquals(credential, credRes);
 	}
