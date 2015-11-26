@@ -84,7 +84,8 @@ public class GoogleContactsTest {
 		serAuth.setCredential(USER_ID, scheduler, credential);
 		MatCredential credRes = serAuth.getCredential(USER_ID, scheduler);
 		System.out.println("test1");
-		//eScontroller.s
+		//eScontroller.setCredential(USER_ID, scheduler, credential);
+		//eScontroller.getContacts(USER_ID, schedulers);
 		assertEquals(credential, credRes);
 	}
 
