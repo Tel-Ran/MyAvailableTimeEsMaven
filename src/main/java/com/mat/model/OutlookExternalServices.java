@@ -3,8 +3,7 @@ package com.mat.model;
 import com.mat.interfaces.IService;
 import com.mat.interfaces.ServicesConstants;
 import com.mat.json.*;
-import microsoft.exchange.webservices.data.core.ExchangeService;
-import microsoft.exchange.webservices.data.core.PropertySet;
+import microsoft.exchange.webservices.data.core.*;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.enumeration.property.BasePropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
@@ -23,232 +22,205 @@ import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import microsoft.exchange.webservices.data.search.*;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
 public class OutlookExternalServices implements IService {
-	private static final ExchangeService DEFAULT_OUTLOOK_SERVICE = new ExchangeService(
-			ExchangeVersion.Exchange2010_SP2);
-	ExchangeService service;
-	List<Folder> folders;
+    private static final ExchangeService DEFAULT_OUTLOOK_SERVICE = new ExchangeService(
+            ExchangeVersion.Exchange2010_SP2);
+    ExchangeService service;
+    List<Folder> folders;
 
-	private List<Folder> getFolders() {
-		return folders;
-	}
+    private List<Folder> getFolders() {
+        return folders;
+    }
 
-	public OutlookExternalServices(ExchangeService service) {
-		initService(service);
-	}
+    public OutlookExternalServices(ExchangeService service) {
+        initService(service);
+    }
 
-	public OutlookExternalServices() {
-		initService(DEFAULT_OUTLOOK_SERVICE);
-	}
+    public OutlookExternalServices() {
+        initService(DEFAULT_OUTLOOK_SERVICE);
+    }
 
-	private void initService(ExchangeService service) {
-		this.service = service;
-		try {
-			folders = getFolderList();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    private void initService(ExchangeService service) {
+        this.service = service;
+        try {
+            folders = getFolderList();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	private List<DownloadEvent> findAppointments(Folder folder, Date startDate, Date endDate) throws Exception {
-		List<DownloadEvent> result = new ArrayList<DownloadEvent>();
-		FolderId folderid = folder.getId();
-		CalendarFolder cf = CalendarFolder.bind(service, folderid);
-		FindItemsResults<Appointment> findResults = cf.findAppointments(new CalendarView(startDate, endDate));
-		for (Appointment appt : findResults.getItems()) {
-			DownloadEvent event = getEventFromAppt(folder, appt);
-			result.add(event);
-		}
-		return result;
-	}
+    private List<DownloadEvent> findAppointments(Folder folder, Date startDate, Date endDate) throws Exception {
+        List<DownloadEvent> result = new ArrayList<DownloadEvent>();
+        FolderId folderid = folder.getId();
+        CalendarFolder cf = CalendarFolder.bind(service, folderid);
+        FindItemsResults<Appointment> findResults = cf.findAppointments(new CalendarView(startDate, endDate));
+        for (Appointment appt : findResults.getItems()) {
+            DownloadEvent event = getEventFromAppt(folder, appt);
+            result.add(event);
+        }
+        return result;
+    }
 
-	private DownloadEvent getEventFromAppt(Folder folder, Appointment appt) throws ServiceLocalException {
-		DownloadEvent event = new DownloadEvent();
-		event.setBeginning(appt.getStart());
-		event.setEnding(appt.getEnd());
-		event.setCalendar(getExteranlCalendarFromAppt(folder));
-		event.setEventName(appt.getSubject());
-		return event;
-	}
+    private DownloadEvent getEventFromAppt(Folder folder, Appointment appt) throws ServiceLocalException {
+        DownloadEvent event = new DownloadEvent();
+        event.setBeginning(appt.getStart());
+        event.setEnding(appt.getEnd());
+        event.setCalendar(getExteranlCalendarFromAppt(folder));
+        event.setEventName(appt.getSubject());
+        return event;
+    }
 
-	private ExternalCalendar getExteranlCalendarFromAppt(Folder folder) throws ServiceLocalException {
-		ExternalCalendar calendar = new ExternalCalendar();
-		calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
-		calendar.setCalendarName(folder.getDisplayName());
-		return calendar;
-	}
+    private ExternalCalendar getExteranlCalendarFromAppt(Folder folder) throws ServiceLocalException {
+        ExternalCalendar calendar = new ExternalCalendar();
+        calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
+        calendar.setCalendarName(folder.getDisplayName());
+        return calendar;
+    }
 
-	private Folder getFolder(ExternalCalendar calendar) {
-		Folder folder = null;
-		try {
-			folder = getFolderByName(calendar.getCalendarName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return folder;
-	}
+    private Folder getFolder(ExternalCalendar calendar) {
+        Folder folder = null;
+        try {
+            folder = getFolderByName(calendar.getCalendarName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return folder;
+    }
 
-	private void clearPreviousEvents(FolderId folderid, String eventName) throws Throwable {
-		ItemView view = new ItemView(1000);
-		view.setPropertySet(new PropertySet(BasePropertySet.IdOnly));
-		SearchFilter sfSearchFilter = new SearchFilter.ContainsSubstring(ItemSchema.Subject, eventName);
-		FindItemsResults<Item> findResults = service.findItems(folderid, sfSearchFilter, view);
-		if (findResults.getTotalCount() != 0) {
-			List<Item> appointments = findResults.getItems();
-			for (Item appointment : appointments) {
-				appointment.delete(DeleteMode.MoveToDeletedItems);
-			}
-		}
-	}
+    private void clearPreviousEvents(FolderId folderid, String eventName) throws Throwable {
+        ItemView view = new ItemView(1000);
+        view.setPropertySet(new PropertySet(BasePropertySet.IdOnly));
+        SearchFilter sfSearchFilter = new SearchFilter.ContainsSubstring(ItemSchema.Subject, eventName);
+        FindItemsResults<Item> findResults = service.findItems(folderid, sfSearchFilter, view);
+        if (findResults.getTotalCount() != 0) {
+            List<Item> appointments = findResults.getItems();
+            for (Item appointment : appointments) {
+                appointment.delete(DeleteMode.MoveToDeletedItems);
+            }
+        }
+    }
 
-	private Folder getFolderByName(String calendarName) throws Exception {
-		for (Folder folder : folders) {
-			if (folder.getDisplayName().equals(calendarName)) {
-				return folder;
-			}
-		}
-		return null;
-	}
+    private Folder getFolderByName(String calendarName) throws Exception {
+        for (Folder folder : folders) {
+            if (folder.getDisplayName().equals(calendarName)) {
+                return folder;
+            }
+        }
+        return null;
+    }
 
-	private void createAppointment(Folder folder, String subject, String textBody, Date startDate, Date endDate)
-			throws Exception {
-		Appointment appointment = new Appointment(service);
-		appointment.setSubject(subject);
-		appointment.setBody(MessageBody.getMessageBodyFromText(textBody));
-		appointment.setStart(startDate);
-		appointment.setEnd(endDate);
-		appointment.save(folder.getId());
-	}
+    private void createAppointment(Folder folder, String subject, String textBody, Date startDate, Date endDate)
+            throws Exception {
+        Appointment appointment = new Appointment(service);
+        appointment.setSubject(subject);
+        appointment.setBody(MessageBody.getMessageBodyFromText(textBody));
+        appointment.setStart(startDate);
+        appointment.setEnd(endDate);
+        appointment.save(folder.getId());
+    }
 
-	private List<Folder> getFolderList() throws Exception {
-		List<Folder> result = new ArrayList<Folder>();
-		int mPageSize = 100;
-		FolderView view = viewInit(0, mPageSize);
-		FindFoldersResults findFolderResults = service.findFolders(WellKnownFolderName.MsgFolderRoot, view);
-		for (Folder myFolder : findFolderResults.getFolders()) {
-			myFolder.load();
-			if (myFolder.getFolderClass().equals("IPF.Appointment")) {
-				FindFoldersResults calendarFoldersResults = myFolder.findFolders(view);
-				result.add(myFolder);
-				for (Folder calFolder : calendarFoldersResults.getFolders()) { //
-					result.add(calFolder);
-				}
-			}
-		}
-		return result;
-	}
+    private List<Folder> getFolderList() throws Exception {
+        List<Folder> result = new ArrayList<Folder>();
+        int mPageSize = 100;
+        FolderView view = viewInit(0, mPageSize);
+        FindFoldersResults findFolderResults = service.findFolders(WellKnownFolderName.MsgFolderRoot, view);
+        for (Folder myFolder : findFolderResults.getFolders()) {
+            myFolder.load();
+            if (myFolder.getFolderClass().equals("IPF.Appointment")) {
+                FindFoldersResults calendarFoldersResults = myFolder.findFolders(view);
+                result.add(myFolder);
+                for (Folder calFolder : calendarFoldersResults.getFolders()) { //
+                    result.add(calFolder);
+                }
+            }
+        }
+        return result;
+    }
 
-	private FolderView viewInit(int moffset, int mPageSize) throws Exception {
-		FolderView view = new FolderView(mPageSize, moffset, OffsetBasePoint.Beginning);
-		PropertySet propertySet = new PropertySet(BasePropertySet.IdOnly);
-		propertySet.add(FolderSchema.DisplayName);
-		propertySet.add(FolderSchema.ChildFolderCount);
-		view.setPropertySet(propertySet);
-		view.setTraversal(FolderTraversal.Shallow);
-		return view;
-	}
+    private FolderView viewInit(int moffset, int mPageSize) throws Exception {
+        FolderView view = new FolderView(mPageSize, moffset, OffsetBasePoint.Beginning);
+        PropertySet propertySet = new PropertySet(BasePropertySet.IdOnly);
+        propertySet.add(FolderSchema.DisplayName);
+        propertySet.add(FolderSchema.ChildFolderCount);
+        view.setPropertySet(propertySet);
+        view.setTraversal(FolderTraversal.Shallow);
+        return view;
+    }
 
-	private Date dateAdd(Date startDateAppointment, int duration) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(startDateAppointment);
-		cal.add(Calendar.MINUTE, duration);
-		return cal.getTime();
-	}
+    private Date dateAdd(Date startDateAppointment, int duration) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDateAppointment);
+        cal.add(Calendar.MINUTE, duration);
+        return cal.getTime();
+    }
 
-	public boolean upload(MatCredential credential, UploadRequest request) throws Throwable {
+    public boolean upload(MatCredential credential, UploadRequest request) throws Throwable {
 
-		changeCredentials(credential);
-		String eventName = request.getMyCalendarName();
-		for (ExternalCalendar calendar : request.getCalendars()) {
-			if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
-				Folder folder = getFolderByName(calendar.getCalendarName());
-				clearPreviousEvents(folder.getId(), eventName);
-				for (Slot slot : request.getSlots()) {
-					Date startDate = slot.getBeginning();
-					Date endDate = dateAdd(startDate, request.getDuration());
-					createAppointment(folder, eventName, "", startDate, endDate);
-				}
-			}
-		}
-		return true;
-	}
+        changeCredentials(credential);
+        String eventName = request.getMyCalendarName();
+        for (ExternalCalendar calendar : request.getCalendars()) {
+            if (calendar.getCalendarService().equalsIgnoreCase(ServicesConstants.OUTLOOK_SERVICE_NAME)) {
+                Folder folder = getFolderByName(calendar.getCalendarName());
+                clearPreviousEvents(folder.getId(), eventName);
+                for (Slot slot : request.getSlots()) {
+                    Date startDate = slot.getBeginning();
+                    Date endDate = dateAdd(startDate, request.getDuration());
+                    createAppointment(folder, eventName, "", startDate, endDate);
+                }
+            }
+        }
+        return true;
+    }
 
-	public DownloadEventsResponse download(MatCredential credential, DownloadEventsRequest request) throws Throwable {
-		changeCredentials(credential);
-		DownloadEventsResponse result = new DownloadEventsResponse();
-		List<ExternalCalendar> calendars = request.getCalendars();
-		List<DownloadEvent> events = new ArrayList<DownloadEvent>();
-		for (ExternalCalendar calendar : calendars) {
-			events.addAll(findAppointments(getFolder(calendar), request.getFromDate(), request.getToDate()));
-		}
-		result.setEvents(events);
-		return result;
-	}
+    public DownloadEventsResponse download(MatCredential credential, DownloadEventsRequest request) throws Throwable {
+        changeCredentials(credential);
+        DownloadEventsResponse result = new DownloadEventsResponse();
+        List<ExternalCalendar> calendars = request.getCalendars();
+        List<DownloadEvent> events = new ArrayList<DownloadEvent>();
+        for (ExternalCalendar calendar : calendars) {
+            events.addAll(findAppointments(getFolder(calendar), request.getFromDate(), request.getToDate()));
+        }
+        result.setEvents(events);
+        return result;
+    }
 
-	private void changeCredentials(MatCredential credential) {
-		// for oauth2 uncomment next line and comment last line
-		// service.setCredentials(new
-		// OAuth2Credentials(credential.getAccessToken()));
-		service.setCredentials(new WebCredentials("telran2015@telran.onmicrosoft.com", "12345.com"));
-	}
+    private void changeCredentials(MatCredential credential) {
+        // for oauth2 uncomment next line and comment last line
+      /*  service.setCredentials(new
+                OAuth2Credentials("AAABAAAAiL9Kn2Z27UubvWFPbm0gLcVILQYs2BBcXR5mHvTwXuUYWMEEqUEAdyvZdyiAtlpfxyMeo28NdWGsziLvlwX_Vw4"+
+                "KzskOpDCG_qzXrtofuT-kY_kHaA68TYfOVtXdbd5SGJlFSubWfQRnLJmsGdKAuA6-XqN0YjuOHMRW5Nwf6J1hc7NoWCMZcxCTMzw8t3yPJCVx4jH"+
+                "WgykVXenTdfftJVsJwP0gbDPE_6KNtwn5lCB3J_oclydejxgNM1xOXiCKH0RCHfPQk8_0Ghx12KBjMfXOweqlKXK8QxebN_ZpCmF65K2SXczhhK2"+
+                "h_YsJYEJRkOY9hNaeQmusdERFoAfjuKMYAzytZM7asFfsgWydMRXZ4RbkUWipjMnCwUO6BdkGVePBwk55a5lvbuPWCE3950kgEQqCC9HfiWCZOAF"+
+                "y-8HKJaZtY1YAs7ZhP6rq5_Z7_xz3-WbdPIaVIyiwc1BI7UJncUOuotvknFIzBNA1rp03TD8u_dKvpc9pCleYsUjC6l9Glx55qPrpMQvnUDHHnRU"+
+                "yPygAAnx9riJ-D92oFS3yjb7JVvJ0yKdUXi13y1nhIAA"));*/
+        ///*credential.getAccessToken()*/
+        service.setCredentials(new WebCredentials("telran2015@telran.onmicrosoft.com", "12345.com"));
+    }
 
-	public List<Person> getContacts(MatCredential credential) throws Throwable {
-		List <Person> persons=new LinkedList<Person>();
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.set(ServicesConstants.AUTHORIZATION, ServicesConstants.BEARER+credential.getAccessToken());
-		headers.set(ServicesConstants.ACCEPT, ServicesConstants.APPLICATION);
-		HttpEntity entity = new HttpEntity(headers);
-		String url=ServicesConstants.CONTACTS;
-		HttpEntity<String> response = restTemplate.exchange(
-				url, HttpMethod.GET, entity, String.class);
+    public List<Person> getContacts(MatCredential credential) throws Throwable {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-		JSONObject obj = new JSONObject(response.getBody());
-		List<Person> list = new ArrayList<Person>();
-		JSONArray array = obj.getJSONArray("value");
-		for(int i = 0 ; i < array.length() ; i++){
-			Person person = new Person();
-			JSONObject obj1 = array.getJSONObject(i);
-			person.setId(i);
-			person.setUserId(new Random().nextInt(100)); // TODO: solve it
-			person.setFirstName((String) obj1.get(ServicesConstants.GIVENNAME));
-			person.setLastName((String) obj1.get(ServicesConstants.SURNAME));
-			JSONArray array1 = obj1.getJSONArray("EmailAddresses");
-			for(int j = 0 ; j < array1.length() ; j++){
-				JSONObject obj2 = array1.getJSONObject(j);
-				person.setEmail((String) obj2.get(ServicesConstants.ADDRESS));
-			}// TODO: solve it
-			list.add(person);
-			System.out.println(person.toString());
-		}
-		return persons;
-	}
+    public List<ExternalCalendar> getCalendars(MatCredential credential) throws Throwable {
+        changeCredentials(credential);
+        List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
+        for (Folder folder : folders) {
+            calendars.add(getCalendarByFolder(folder));
+        }
+        return calendars;
+    }
 
-	public List<ExternalCalendar> getCalendars(MatCredential credential) throws Throwable {
-		changeCredentials(credential);
-		List<ExternalCalendar> calendars = new ArrayList<ExternalCalendar>();
-		for (Folder folder : folders) {
-			calendars.add(getCalendarByFolder(folder));
-		}
-		return calendars;
-	}
-
-	private ExternalCalendar getCalendarByFolder(Folder folder) throws ServiceLocalException {
-		ExternalCalendar calendar = new ExternalCalendar();
-		calendar.setCalendarName(folder.getDisplayName());
-		calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
-		return null;
-	}
+    private ExternalCalendar getCalendarByFolder(Folder folder) throws ServiceLocalException {
+        ExternalCalendar calendar = new ExternalCalendar();
+        calendar.setCalendarName(folder.getDisplayName());
+        calendar.setCalendarService(ServicesConstants.OUTLOOK_SERVICE_NAME);
+        return null;
+    }
 }
 
 /*
