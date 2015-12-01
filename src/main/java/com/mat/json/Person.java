@@ -1,10 +1,20 @@
 package com.mat.json;
 
 public class Person {
+	int id;
 	String firstName;
 	String lastName;
 	String email;
 	int userId;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -31,7 +41,7 @@ public class Person {
 	}
 	@Override
 	public String toString() {
-		return "Person [firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", userId=" + userId
+		return "Person [id= "+id+", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", userId=" + userId
 				+ "]";
 	}
 	
