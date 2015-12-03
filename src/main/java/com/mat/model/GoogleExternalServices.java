@@ -17,6 +17,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
@@ -43,7 +44,7 @@ public class GoogleExternalServices implements IService {
 
 	private static HttpTransport HTTP_TRANSPORT;
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-	private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);	
+	private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY, "https://www.google.com/m8/feeds");	
 	
 	static 	 
 	 {
@@ -55,12 +56,26 @@ public class GoogleExternalServices implements IService {
 	        }
 	    }
 	
-	 	
+	/*private static final JsonFactory JSON_FACTORY = new JacksonFactory();
+	private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+	...
+	String refreshToken = credential.getRefreshToken();
+	GoogleCredential googleCredential =  new GoogleCredential.Builder()
+	                                        .setTransport(HTTP_TRANSPORT)
+	                                        .setJsonFactory(JSON_FACTORY)
+	                                        .setClientSecrets("cliendId", "secretId")
+	                                        .build();
+	                        googleCredential.setRefreshToken(refreshToken);
+	                        googleCredential.refreshToken();
+	*/
+	
+	
+	
 	private Credential getGoogleCredential(MatCredential credential) throws Throwable{
 		Credential googleCredential= 
 				new GoogleCredential.Builder()
-					.setJsonFactory(JSON_FACTORY)
 					.setTransport(HTTP_TRANSPORT)
+					.setJsonFactory(JSON_FACTORY)
 					.setClientSecrets(ServicesConstants.CLIENT_ID, ServicesConstants.CLIENT_SECRET)
 					.build();
 		googleCredential.setRefreshToken(credential.getRefreshToken()); // you need String refreshToken for this method
@@ -146,8 +161,13 @@ public class GoogleExternalServices implements IService {
 
 	public List<Person> getContacts(MatCredential credential) throws Throwable {
 		Credential googleCredential = getGoogleCredential(credential);
-		ContactsService myService = new ContactsService("contacts");//�� ��� ������ ���??
+		//boolean credentialRefresh=googleCredential.refreshToken();
+		//if (credentialRefresh) System.out.println("CredRefresh=true");
+		//else System.out.println("CredRefresh=false");
+		ContactsService myService = new ContactsService("MAT");//�� ��� ������ ���??
+		//ContactsService myService1= new ContactsS
 		myService.setOAuth2Credentials(googleCredential);
+		//myService.setUserCredentials("aleks.fainberg", "psw");
 	    URL feedUrl = new URL("https://www.google.com/m8/feeds/contacts/default/full");
 	    Query myQuery = new Query(feedUrl);
 	    myQuery.setMaxResults(3000);
@@ -163,13 +183,27 @@ public class GoogleExternalServices implements IService {
 		    	for(Email email : entry.getEmailAddresses()){
 		    		if(email.getPrimary())
 			    		  currentEmail=email.getAddress();
- 
-			    }
-		    	//Contact contact=new Contact(entry.getName().getFullName().getValue(), currentEmail);
+ 			    }
+		    	//System.out.println(currentEmail);
+		    	
+		    	/*//if(entry.getName() != null && entry.getName().getFamilyName() != null)
+		    	String fullName=entry.getName().getFullName().getValue();
+		    	System.out.println(fullName);*/
+		    	
+		    	String firstName="";
+		    	if(entry.getName() != null && entry.getName().getGivenName() != null)
+		    		firstName=entry.getName().getGivenName().getValue();		    	
+		    	//System.out.println(firstName);
+		    	
+		    	String lastName="";
+		    	if(entry.getName() != null && entry.getName().getFamilyName() != null)
+		    		lastName=entry.getName().getFamilyName().getValue();		    	
+		    	//System.out.println(lastName);
+		    	
 		    	Person person =new Person();
 		    	person.setEmail(currentEmail);
-		    	person.setFirstName(entry.getName().getGivenName().getValue());
-		    	person.setLastName(entry.getName().getFamilyName().getValue());
+		    	person.setFirstName(firstName);
+		    	person.setLastName(lastName);
 		    	//System.out.println(person);
 		    	persons.add(person);
 		}

@@ -15,8 +15,8 @@ public class EScontroller implements IExternalServices {
 	 * Letting Spring to make an instance of ServicesAuthorization class
 	 * (settings in external_services-servlet.xml)
 	 */
-	@Autowired
-	ServicesAuthorization serAuth;
+	//@Autowired
+	ServicesAuthorization serAuth = new ServicesAuthorization();
 
 	@Override
 	public List<ExternalCalendar> getCalendars(int userId, List<Scheduler> schedulers) throws Throwable {		
