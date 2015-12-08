@@ -210,13 +210,13 @@ public class OutlookExternalServices implements IService {
     public List<Person> getContacts(MatCredential credential) throws Throwable {
         List <Person> persons=new LinkedList<Person>();
         RestTemplate restTemplate = new RestTemplate();
-        //Create headers
+        // Create headers
         HttpHeaders headers = new HttpHeaders();
         headers.set(ServicesConstants.AUTHORIZATION, ServicesConstants.BEARER+credential.getAccessToken());
         headers.set(ServicesConstants.ACCEPT, ServicesConstants.APPLICATION);
         HttpEntity entity = new HttpEntity(headers);
         String url=ServicesConstants.CONTACTS;
-        //create response
+        // create response
         HttpEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.GET, entity, String.class);
 
@@ -226,7 +226,7 @@ public class OutlookExternalServices implements IService {
         for(int i = 0 ; i < array.length() ; i++){
             Person person = new Person();
             JSONObject obj1 = array.getJSONObject(i);
-            person.setId(i);// TODO: solve it
+           // person.setId(i);// TODO: solve it
             person.setUserId(new Random().nextInt(100)); // TODO: solve it
             person.setFirstName((String) obj1.get(ServicesConstants.GIVENNAME));
             person.setLastName((String) obj1.get(ServicesConstants.SURNAME));

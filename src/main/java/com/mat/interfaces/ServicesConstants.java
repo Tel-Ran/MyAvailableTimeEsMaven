@@ -17,5 +17,5 @@ public interface ServicesConstants {
 	static final String ADDRESS = "Address";
 	static final String GIVENNAME = "GivenName";
 	static final String SURNAME = "Surname";
-
+	
 }
