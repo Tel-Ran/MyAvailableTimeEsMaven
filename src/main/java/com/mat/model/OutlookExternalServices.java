@@ -22,6 +22,12 @@ import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import microsoft.exchange.webservices.data.search.*;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -202,8 +208,37 @@ public class OutlookExternalServices implements IService {
     }
 
     public List<Person> getContacts(MatCredential credential) throws Throwable {
-        // TODO Auto-generated method stub
-        return null;
+        List <Person> persons=new LinkedList<Person>();
+        RestTemplate restTemplate = new RestTemplate();
+        //Create headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(ServicesConstants.AUTHORIZATION, ServicesConstants.BEARER+credential.getAccessToken());
+        headers.set(ServicesConstants.ACCEPT, ServicesConstants.APPLICATION);
+        HttpEntity entity = new HttpEntity(headers);
+        String url=ServicesConstants.CONTACTS;
+        //create response
+        HttpEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, String.class);
+
+        JSONObject obj = new JSONObject(response.getBody());
+        List<Person> list = new ArrayList<Person>();
+        JSONArray array = obj.getJSONArray("value");
+        for(int i = 0 ; i < array.length() ; i++){
+            Person person = new Person();
+            JSONObject obj1 = array.getJSONObject(i);
+           // person.setId(i);// TODO: solve it
+            person.setUserId(new Random().nextInt(100)); // TODO: solve it
+            person.setFirstName((String) obj1.get(ServicesConstants.GIVENNAME));
+            person.setLastName((String) obj1.get(ServicesConstants.SURNAME));
+            JSONArray array1 = obj1.getJSONArray("EmailAddresses");
+            for(int j = 0 ; j < array1.length() ; j++){
+                JSONObject obj2 = array1.getJSONObject(j);
+                person.setEmail((String) obj2.get(ServicesConstants.ADDRESS));
+            }
+            list.add(person);
+            System.out.println(person.toString());
+        }
+        return persons;
     }
 
     public List<ExternalCalendar> getCalendars(MatCredential credential) throws Throwable {
