@@ -32,11 +32,11 @@ import com.mat.model.ServicesAuthorization;
 @ContextConfiguration(locations = {"file:target/ExternalServices/WEB-INF/external_services-servlet.xml"})
 public class GoogleContactsTest {
 	
-	private static final String ACCOUNT_NAME = "google";
+	private static final String ACCOUNT_NAME = "aleks.fainberg";
 
 	private static final int USER_ID = 1;
 
-	private static final String SCHEDULER_NAME = null;
+	private static final String SCHEDULER_NAME = "Google";
 
 	@SuppressWarnings("deprecation")
 	private static final Date EXP_TIME = new Date();
@@ -85,7 +85,7 @@ public class GoogleContactsTest {
 	}
 
 	@Test
-	public void testSetCredential() {
+	public void testGetContacts() {
 		serAuth.setCredential(USER_ID, scheduler, credential);
 		MatCredential credRes = serAuth.getCredential(USER_ID, scheduler);
 		System.out.println("test1");
