@@ -216,7 +216,7 @@ public class OutlookExternalServices implements IService {
         headers.set(ServicesConstants.ACCEPT, ServicesConstants.APPLICATION);
         HttpEntity entity = new HttpEntity(headers);
         String url=ServicesConstants.CONTACTS;
-        // create response
+        // create response for outlook
         HttpEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.GET, entity, String.class);
 
